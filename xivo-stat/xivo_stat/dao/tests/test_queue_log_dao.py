@@ -65,10 +65,10 @@ class TestQueueLogDAO(unittest.TestCase):
                                     'event': 'full',
                                     'time': datetimewithmicro,
                                     'callid': callid})
-        after =  self._build_date(2012, 01, 02, 00, 00, 00)
+        after = self._build_date(2012, 01, 02, 00, 00, 00)
         self._insert_entry_queue_full(after, '1234.123', queuename)
 
-        before =  self._build_date(2011, 12, 31, 00, 00, 00)
+        before = self._build_date(2011, 12, 31, 00, 00, 00)
         self._insert_entry_queue_full(before, '5555555.123', queuename)
 
         datetimestart = self._build_date(2012, 01, 01, 00, 00, 00)
