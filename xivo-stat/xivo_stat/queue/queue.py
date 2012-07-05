@@ -1,7 +1,7 @@
 # -*- coding: UTF-8 -*-
 
-from xivo_stat.dao import queue_log_dao
-from xivo_stat.dao import call_on_queue_dao
+from xivo_dao import queue_log_dao
+from xivo_dao import call_on_queue_dao
 
 
 def fill_full_call(start, end):
