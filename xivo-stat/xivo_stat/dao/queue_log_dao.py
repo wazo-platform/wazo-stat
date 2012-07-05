@@ -2,7 +2,7 @@
 
 from xivo_stat.dao.alchemy.queue_log import QueueLog
 from xivo_stat.dao.alchemy import dbconnection
-from sqlalchemy import and_, between
+from sqlalchemy import between
 
 _DB_NAME = 'asterisk'
 
@@ -12,11 +12,10 @@ def _session():
     return connection.get_session()
 
 
-def get_queue_full_call(start, end, queuename):
+def get_queue_full_call(start, end):
     res = (_session()
            .query(QueueLog.queuename, QueueLog.time, QueueLog.callid)
-           .filter(and_(QueueLog.queuename == queuename,
-                        between(QueueLog.time, start, end))))
+           .filter(between(QueueLog.time, start, end)))
     if res.count() == 0:
         raise LookupError
     return [{'queue_name': r.queuename,

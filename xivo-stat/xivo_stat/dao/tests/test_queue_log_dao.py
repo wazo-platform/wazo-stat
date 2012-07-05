@@ -74,6 +74,6 @@ class TestQueueLogDAO(unittest.TestCase):
         datetimestart = self._build_date(2012, 01, 01, 00, 00, 00)
         datetimeend = self._build_date(2012, 01, 01, 00, 59, 59)
 
-        result = queue_log_dao.get_queue_full_call(datetimestart, datetimeend, queuename)
+        result = queue_log_dao.get_queue_full_call(datetimestart, datetimeend)
 
         self.assertEqual(sorted(result), sorted(expected_result))
