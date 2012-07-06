@@ -25,4 +25,3 @@ def fill_stats():
                             now.day,
                             now.hour - 1)
     fill_full_call(start, end)
-
