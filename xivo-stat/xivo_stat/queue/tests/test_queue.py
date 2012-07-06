@@ -31,7 +31,7 @@ class TestQueue(unittest.TestCase):
 
         add_full_call.assert_called_once_with(callid, d1, self._queue_name)
 
-    @patch('xivo_dao.call_on_queue_dao.get_most_recent_time', get_most_recent_time)
+    @patch('xivo_dao.stat_call_on_queue_dao.get_most_recent_time', get_most_recent_time)
     @patch('xivo_stat.queue.queue.fill_full_call', fill_full_call)
     def test_fill_stats(self):
         now = datetime.datetime.now()
