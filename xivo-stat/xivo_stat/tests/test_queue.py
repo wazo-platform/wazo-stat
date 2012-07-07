@@ -1,9 +1,8 @@
 # -*- coding: UTF-8 -*-
-
 import datetime
 import unittest
 from mock import Mock, patch
-from xivo_stat.queue import queue
+from xivo_stat import queue
 
 get_full_call = Mock()
 add_full_call = Mock()
@@ -32,7 +31,7 @@ class TestQueue(unittest.TestCase):
         add_full_call.assert_called_once_with(callid, d1, self._queue_name)
 
     @patch('xivo_dao.stat_call_on_queue_dao.get_most_recent_time', get_most_recent_time)
-    @patch('xivo_stat.queue.queue.fill_full_call', fill_full_call)
+    @patch('xivo_stat.queue.fill_full_call', fill_full_call)
     def test_fill_stats(self):
         now = datetime.datetime.now()
         most_recent_time = now - datetime.timedelta(hours=23, minutes=55)
@@ -46,4 +45,3 @@ class TestQueue(unittest.TestCase):
         queue.fill_stats()
 
         fill_full_call.assert_called_once_with(expected_start, expected_stop)
-
