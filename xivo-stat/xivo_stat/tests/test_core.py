@@ -5,17 +5,25 @@ from mock import Mock
 from mock import patch
 from xivo_stat import core
 
-mock_get_most_recent_time = Mock()
-mock_get_first_time = Mock()
-mock_start_time = Mock()
 mock_end_time = Mock()
+mock_fill_calls = Mock()
+mock_get_first_time = Mock()
+mock_get_most_recent_time = Mock()
+mock_insert_periodic_stat = Mock()
+mock_start_time = Mock()
+
+mocks = [mock_end_time,
+         mock_fill_calls,
+         mock_get_first_time,
+         mock_get_most_recent_time,
+         mock_insert_periodic_stat,
+         mock_start_time]
 
 
 class TestCore(unittest.TestCase):
 
     def setUp(self):
-        mock_get_most_recent_time.reset_mock()
-        mock_get_first_time.reset_mock()
+        map(lambda mock: mock.reset_mock(), mocks)
 
     def test_gen_time(self):
         s = datetime.datetime(2012, 1, 1)
@@ -106,3 +114,19 @@ class TestCore(unittest.TestCase):
         result = core.get_start_end_time()
 
         self.assertEqual(result, expected)
+
+    @patch('xivo_stat.core.get_start_time', mock_start_time)
+    @patch('xivo_stat.core.get_end_time', mock_end_time)
+    @patch('xivo_stat.queue.fill_calls', mock_fill_calls)
+    @patch('xivo_stat.queue.insert_periodic_stat',
+           mock_insert_periodic_stat)
+    def test_update_db(self):
+        start = datetime.datetime(2012, 1, 1)
+        end = datetime.datetime(2012, 1, 1, 4, 59, 59, 999999)
+        mock_start_time.return_value = start
+        mock_end_time.return_value = end
+
+        core.update_db()
+
+        mock_fill_calls.assert_called_once_with(start, end)
+        mock_insert_periodic_stat.assert_called_once_with(start, end)

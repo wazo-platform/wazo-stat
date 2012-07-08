@@ -3,6 +3,7 @@ import datetime
 
 from xivo_dao import stat_call_on_queue_dao
 from xivo_dao import queue_log_dao
+from xivo_stat import queue
 
 
 def gen_time(start, end, step):
@@ -39,3 +40,13 @@ def get_end_time():
 
 def get_start_end_time():
     return get_start_time(), get_end_time()
+
+
+def update_db():
+    try:
+        start, end = get_start_end_time()
+    except RuntimeError:
+        return
+
+    queue.fill_calls(start, end)
+    queue.insert_periodic_stat(start, end)
