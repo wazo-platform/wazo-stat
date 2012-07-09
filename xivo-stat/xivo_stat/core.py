@@ -1,9 +1,19 @@
 # -*- coding: utf-8 -*-
 import datetime
+import sys
 
 from xivo_dao import stat_queue_periodic_dao, stat_call_on_queue_dao
 from xivo_dao import queue_log_dao
 from xivo_stat import queue
+from sqlalchemy.exc import IntegrityError
+from xivo_dao.alchemy import dbconnection
+
+_DB_NAME = 'asterisk'
+
+
+def _session():
+    connection = dbconnection.get_connection(_DB_NAME)
+    return connection.get_session()
 
 
 DELTA_1HOUR = datetime.timedelta(hours=1)
@@ -45,14 +55,25 @@ def get_start_end_time():
     return get_start_time(), get_end_time()
 
 
+def _clean_up_after_error():
+    print 'Inconsistent cache, cleaning up...'
+    _session().rollback()
+    clean_db()
+    sys.exit(1)
+
+
 def update_db():
     try:
         start, end = get_start_end_time()
     except RuntimeError:
         return
 
-    queue.fill_calls(start, end)
-    queue.insert_periodic_stat(start, end)
+    print 'Filling cache into DB'
+    try:
+        queue.fill_calls(start, end)
+        queue.insert_periodic_stat(start, end)
+    except (IntegrityError, KeyboardInterrupt):
+        _clean_up_after_error()
 
 
 def clean_db():
