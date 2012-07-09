@@ -1,0 +1,47 @@
+#!/usr/bin/python
+# -*- coding: utf8 -*-
+
+from xivo import argparse_cmd
+from xivo_stat import queue
+from xivo_dao.alchemy import dbconnection
+
+
+def main():
+    argparse_cmd.execute_command(_LoadtesterCommand())
+
+
+class _LoadtesterCommand(argparse_cmd.AbstractCommand):
+    def configure_parser(self, parser):
+        pass
+
+    def configure_subcommands(self, subcommands):
+        subcommands.add_subcommand(_FillDbSubcommand('fill_db'))
+        subcommands.add_subcommand(_CleanDbSubcommand('clean_db'))
+
+    def pre_execute(self, parsed_args):
+        db_connection_pool = dbconnection.DBConnectionPool(dbconnection.DBConnection)
+        dbconnection.register_db_connection_pool(db_connection_pool)
+
+        uri = 'postgresql://asterisk:proformatique@localhost/asterisk'
+        dbconnection.add_connection_as(uri, 'asterisk')
+
+    def post_execute(self, parsed_args):
+        dbconnection.unregister_db_connection_pool()
+
+
+class _FillDbSubcommand(argparse_cmd.AbstractSubcommand):
+    def configure_parser(self, parser):
+        pass
+
+    def execute(self, parsed_args):
+        pass
+
+
+class _CleanDbSubcommand(argparse_cmd.AbstractSubcommand):
+
+    def execute(self, parsed_args):
+        pass
+
+
+if __name__ == '__main__':
+    main()
