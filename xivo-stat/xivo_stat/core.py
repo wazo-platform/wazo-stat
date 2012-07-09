@@ -1,9 +1,12 @@
 # -*- coding: utf-8 -*-
 import datetime
 
-from xivo_dao import stat_call_on_queue_dao
+from xivo_dao import stat_queue_periodic_dao, stat_call_on_queue_dao
 from xivo_dao import queue_log_dao
 from xivo_stat import queue
+
+
+DELTA_1HOUR = datetime.timedelta(hours=1)
 
 
 def gen_time(start, end, step):
@@ -26,7 +29,7 @@ def end_of_previous_hour(t):
 
 def get_start_time():
     try:
-        return hour_start(stat_call_on_queue_dao.get_most_recent_time())
+        return hour_start(stat_queue_periodic_dao.get_most_recent_time()) + DELTA_1HOUR
     except LookupError:
         try:
             return hour_start(queue_log_dao.get_first_time())
@@ -50,3 +53,8 @@ def update_db():
 
     queue.fill_calls(start, end)
     queue.insert_periodic_stat(start, end)
+
+
+def clean_db():
+    stat_call_on_queue_dao.clean_table()
+    stat_queue_periodic_dao.clean_table()

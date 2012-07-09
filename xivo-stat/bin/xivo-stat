@@ -2,15 +2,15 @@
 # -*- coding: utf8 -*-
 
 from xivo import argparse_cmd
-from xivo_stat import queue
+from xivo_stat import core
 from xivo_dao.alchemy import dbconnection
 
 
 def main():
-    argparse_cmd.execute_command(_LoadtesterCommand())
+    argparse_cmd.execute_command(_XivoStatCommand())
 
 
-class _LoadtesterCommand(argparse_cmd.AbstractCommand):
+class _XivoStatCommand(argparse_cmd.AbstractCommand):
     def configure_parser(self, parser):
         pass
 
@@ -34,13 +34,13 @@ class _FillDbSubcommand(argparse_cmd.AbstractSubcommand):
         pass
 
     def execute(self, parsed_args):
-        pass
+        core.update_db()
 
 
 class _CleanDbSubcommand(argparse_cmd.AbstractSubcommand):
 
     def execute(self, parsed_args):
-        pass
+        core.clean_db()
 
 
 if __name__ == '__main__':

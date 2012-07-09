@@ -11,13 +11,17 @@ mock_get_first_time = Mock()
 mock_get_most_recent_time = Mock()
 mock_insert_periodic_stat = Mock()
 mock_start_time = Mock()
+mock_clean_table_stat_call_on_queue = Mock()
+mock_clean_table_stat_queue_periodic = Mock()
 
 mocks = [mock_end_time,
          mock_fill_calls,
          mock_get_first_time,
          mock_get_most_recent_time,
          mock_insert_periodic_stat,
-         mock_start_time]
+         mock_start_time,
+         mock_clean_table_stat_call_on_queue,
+         mock_clean_table_stat_queue_periodic]
 
 
 class TestCore(unittest.TestCase):
@@ -55,18 +59,18 @@ class TestCore(unittest.TestCase):
 
         self.assertEqual(result, expected)
 
-    @patch('xivo_dao.stat_call_on_queue_dao.get_most_recent_time',
+    @patch('xivo_dao.stat_queue_periodic_dao.get_most_recent_time',
            mock_get_most_recent_time)
     def test_get_start_time_has_call_on_queue_entry(self):
         mock_get_most_recent_time.return_value = datetime.datetime(2012, 1, 1, 1, 23, 54)
 
-        expected = datetime.datetime(2012, 1, 1, 1, 0, 0)
+        expected = datetime.datetime(2012, 1, 1, 2, 0, 0)
 
         result = core.get_start_time()
 
         self.assertEqual(result, expected)
 
-    @patch('xivo_dao.stat_call_on_queue_dao.get_most_recent_time',
+    @patch('xivo_dao.stat_queue_periodic_dao.get_most_recent_time',
            mock_get_most_recent_time)
     @patch('xivo_dao.queue_log_dao.get_first_time', mock_get_first_time)
     def test_get_start_time_no_call_on_queue(self):
@@ -79,7 +83,7 @@ class TestCore(unittest.TestCase):
 
         self.assertEqual(result, expected)
 
-    @patch('xivo_dao.stat_call_on_queue_dao.get_most_recent_time',
+    @patch('xivo_dao.stat_queue_periodic_dao.get_most_recent_time',
            mock_get_most_recent_time)
     @patch('xivo_dao.queue_log_dao.get_first_time', mock_get_first_time)
     def test_get_start_time_no_data(self):
@@ -130,3 +134,12 @@ class TestCore(unittest.TestCase):
 
         mock_fill_calls.assert_called_once_with(start, end)
         mock_insert_periodic_stat.assert_called_once_with(start, end)
+
+    @patch('xivo_dao.stat_call_on_queue_dao.clean_table', mock_clean_table_stat_call_on_queue)
+    @patch('xivo_dao.stat_queue_periodic_dao.clean_table', mock_clean_table_stat_queue_periodic)
+    def test_clean_db(self):
+
+        core.clean_db()
+
+        mock_clean_table_stat_call_on_queue.assert_called_with()
+        mock_clean_table_stat_queue_periodic.assert_called_with()
