@@ -9,6 +9,9 @@ mock_end_time = Mock()
 mock_fill_calls = Mock()
 mock_get_first_time = Mock()
 mock_get_most_recent_time = Mock()
+mock_get_queue_names_in_range = Mock()
+mock_insert_if_missing = Mock()
+mock_insert_missing_queues = Mock()
 mock_insert_periodic_stat = Mock()
 mock_start_time = Mock()
 mock_clean_table_stat_call_on_queue = Mock()
@@ -18,6 +21,8 @@ mocks = [mock_end_time,
          mock_fill_calls,
          mock_get_first_time,
          mock_get_most_recent_time,
+         mock_insert_if_missing,
+         mock_insert_missing_queues,
          mock_insert_periodic_stat,
          mock_start_time,
          mock_clean_table_stat_call_on_queue,
@@ -124,6 +129,7 @@ class TestCore(unittest.TestCase):
     @patch('xivo_stat.queue.fill_calls', mock_fill_calls)
     @patch('xivo_stat.queue.insert_periodic_stat',
            mock_insert_periodic_stat)
+    @patch('xivo_stat.core.insert_missing_queues', mock_insert_missing_queues)
     def test_update_db(self):
         start = datetime.datetime(2012, 1, 1)
         end = datetime.datetime(2012, 1, 1, 4, 59, 59, 999999)
@@ -132,14 +138,26 @@ class TestCore(unittest.TestCase):
 
         core.update_db()
 
+        mock_insert_missing_queues.assert_called_once_with(start, end)
         mock_fill_calls.assert_called_once_with(start, end)
         mock_insert_periodic_stat.assert_called_once_with(start, end)
 
     @patch('xivo_dao.stat_call_on_queue_dao.clean_table', mock_clean_table_stat_call_on_queue)
     @patch('xivo_dao.stat_queue_periodic_dao.clean_table', mock_clean_table_stat_queue_periodic)
     def test_clean_db(self):
-
         core.clean_db()
 
         mock_clean_table_stat_call_on_queue.assert_called_with()
         mock_clean_table_stat_queue_periodic.assert_called_with()
+
+    @patch('xivo_dao.queue_log_dao.get_queue_names_in_range', mock_get_queue_names_in_range)
+    @patch('xivo_dao.stat_queue_dao.insert_if_missing', mock_insert_if_missing)
+    def test_insert_missing_queues(self):
+        start = datetime.datetime(2012, 1, 1, 1, 1, 1)
+        end = datetime.datetime(2012, 1, 2, 1, 1, 1)
+        queue_names = ['queue_%s' % x for x in range(10)]
+        mock_get_queue_names_in_range.return_value = queue_names
+
+        core.insert_missing_queues(start, end)
+
+        mock_insert_if_missing.assert_called_once_with(queue_names)
