@@ -39,11 +39,20 @@ def fill_answered_call(start, end):
                                                  call['queue_name'])
 
 
+def fill_timeout_call(start, end):
+    timeout_calls = queue_log_dao.get_queue_timeout_call(start, end)
+    for call in timeout_calls:
+        stat_call_on_queue_dao.add_timeout_call(call['callid'],
+                                                call['time'],
+                                                call['queue_name'])
+
+
 def fill_calls(start, end):
     fill_abandoned_call(start, end)
     fill_answered_call(start, end)
     fill_closed_call(start, end)
     fill_full_call(start, end)
+    fill_timeout_call(start, end)
 
 
 def insert_periodic_stat(start, end):
