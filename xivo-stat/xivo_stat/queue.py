@@ -23,6 +23,14 @@ def fill_joinempty_call(start, end):
                                                   call['queue_name'])
 
 
+def fill_leaveempty_call(start, end):
+    leaveempty_calls = queue_log_dao.get_queue_leaveempty_call(start, end)
+    for call in leaveempty_calls:
+        stat_call_on_queue_dao.add_leaveempty_call(call['callid'],
+                                                   call['time'],
+                                                   call['queue_name'])
+
+
 def fill_abandoned_call(start, end):
     abandoned_calls = queue_log_dao.get_queue_abandoned_call(start, end)
     for call in abandoned_calls:
@@ -61,6 +69,7 @@ def fill_calls(start, end):
     fill_closed_call(start, end)
     fill_full_call(start, end)
     fill_joinempty_call(start, end)
+    fill_leaveempty_call(start, end)
     fill_timeout_call(start, end)
 
 
