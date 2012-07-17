@@ -15,6 +15,14 @@ def fill_full_call(start, end):
                                              call['queue_name'])
 
 
+def fill_abandoned_call(start, end):
+    abandoned_calls = queue_log_dao.get_queue_abandoned_call(start, end)
+    for call in abandoned_calls:
+        stat_call_on_queue_dao.add_abandoned_call(call['callid'],
+                                                  call['time'],
+                                                  call['queue_name'])
+
+
 def fill_closed_call(start, end):
     closed_calls = queue_log_dao.get_queue_closed_call(start, end)
     for call in closed_calls:
@@ -32,6 +40,7 @@ def fill_answered_call(start, end):
 
 
 def fill_calls(start, end):
+    fill_abandoned_call(start, end)
     fill_answered_call(start, end)
     fill_closed_call(start, end)
     fill_full_call(start, end)

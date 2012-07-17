@@ -7,12 +7,15 @@ from mock import Mock, patch, call
 from xivo_stat import queue
 
 
+mock_add_abandoned_call = Mock()
 mock_add_answered_call = Mock()
 mock_add_closed_call = Mock()
 mock_add_full_call = Mock()
+mock_fill_abandoned_call = Mock()
 mock_fill_answered_call = Mock()
 mock_fill_closed_call = Mock()
 mock_fill_full_call = Mock()
+mock_get_abandoned_call = Mock()
 mock_get_answered_call = Mock()
 mock_get_closed_call = Mock()
 mock_get_full_call = Mock()
@@ -22,12 +25,15 @@ mock_insert_periodic_stat = Mock()
 mock_insert_stats = Mock()
 
 
-mocks = [mock_add_answered_call,
+mocks = [mock_add_abandoned_call,
+         mock_add_answered_call,
          mock_add_closed_call,
          mock_add_full_call,
+         mock_fill_abandoned_call,
          mock_fill_answered_call,
          mock_fill_closed_call,
          mock_fill_full_call,
+         mock_get_abandoned_call,
          mock_get_answered_call,
          mock_get_closed_call,
          mock_get_full_call,
@@ -100,14 +106,35 @@ class TestQueue(unittest.TestCase):
 
         mock_add_answered_call.assert_called_once_with(callid, d1, self._queue_name)
 
+    @patch('xivo_dao.queue_log_dao.get_queue_abandoned_call',
+           mock_get_abandoned_call)
+    @patch('xivo_dao.stat_call_on_queue_dao.add_abandoned_call',
+           mock_add_abandoned_call)
+    def test_fill_abandoned(self):
+        d1 = (datetime.datetime(2012, 01, 01)
+              .strftime("%Y-%m-%d %H:%M:%S.%f"))
+        d2 = (datetime.datetime(2012, 01, 01, 23, 59, 59, 999999)
+              .strftime("%Y-%m-%d %H:%M:%S.%f"))
+        callid = '1234567.890'
+        mock_get_abandoned_call.return_value = [{'queue_name': self._queue_name,
+                                                 'event': 'abandoned',
+                                                 'time': d1,
+                                                 'callid': callid}]
+
+        queue.fill_abandoned_call(d1, d2)
+
+        mock_add_abandoned_call.assert_called_once_with(callid, d1, self._queue_name)
+
     @patch('xivo_stat.queue.fill_full_call', mock_fill_full_call)
     @patch('xivo_stat.queue.fill_closed_call', mock_fill_closed_call)
     @patch('xivo_stat.queue.fill_answered_call', mock_fill_answered_call)
+    @patch('xivo_stat.queue.fill_abandoned_call', mock_fill_abandoned_call)
     def test_fill_calls(self):
         start = datetime.datetime(2012, 1, 1)
         end = datetime.datetime(2012, 1, 1, 4, 59, 59, 999999)
         queue.fill_calls(start, end)
 
+        mock_fill_abandoned_call.assert_called_once_with(start, end)
         mock_fill_full_call.assert_called_once_with(start, end)
         mock_fill_closed_call.assert_called_once_with(start, end)
         mock_fill_answered_call.assert_called_once_with(start, end)
