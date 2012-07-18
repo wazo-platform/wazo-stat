@@ -113,14 +113,16 @@ class TestQueue(unittest.TestCase):
         d2 = (datetime.datetime(2012, 01, 01, 23, 59, 59, 999999)
               .strftime("%Y-%m-%d %H:%M:%S.%f"))
         callid = '1234567.890'
+        waittime = 12
         mock_get_answered_call.return_value = [{'queue_name': self._queue_name,
                                                 'event': 'answered',
                                                 'time': d1,
-                                                'callid': callid}]
+                                                'callid': callid,
+                                                'waittime': waittime}]
 
         queue.fill_answered_call(d1, d2)
 
-        mock_add_answered_call.assert_called_once_with(callid, d1, self._queue_name)
+        mock_add_answered_call.assert_called_once_with(callid, d1, self._queue_name, waittime)
 
     @patch('xivo_dao.queue_log_dao.get_queue_abandoned_call',
            mock_get_abandoned_call)
@@ -132,14 +134,16 @@ class TestQueue(unittest.TestCase):
         d2 = (datetime.datetime(2012, 01, 01, 23, 59, 59, 999999)
               .strftime("%Y-%m-%d %H:%M:%S.%f"))
         callid = '1234567.890'
+        waittime = 3
         mock_get_abandoned_call.return_value = [{'queue_name': self._queue_name,
                                                  'event': 'abandoned',
                                                  'time': d1,
-                                                 'callid': callid}]
+                                                 'callid': callid,
+                                                 'waittime': waittime}]
 
         queue.fill_abandoned_call(d1, d2)
 
-        mock_add_abandoned_call.assert_called_once_with(callid, d1, self._queue_name)
+        mock_add_abandoned_call.assert_called_once_with(callid, d1, self._queue_name, waittime)
 
     @patch('xivo_dao.queue_log_dao.get_queue_joinempty_call',
            mock_get_joinempty_call)
@@ -170,14 +174,16 @@ class TestQueue(unittest.TestCase):
         d2 = (datetime.datetime(2012, 01, 01, 23, 59, 59, 999999)
               .strftime("%Y-%m-%d %H:%M:%S.%f"))
         callid = '1234567.890'
+        waittime = 11
         mock_get_leaveempty_call.return_value = [{'queue_name': self._queue_name,
-                                                 'event': 'leaveempty',
-                                                 'time': d1,
-                                                 'callid': callid}]
+                                                  'event': 'leaveempty',
+                                                  'time': d1,
+                                                  'callid': callid,
+                                                  'waittime': waittime}]
 
         queue.fill_leaveempty_call(d1, d2)
 
-        mock_add_leaveempty_call.assert_called_once_with(callid, d1, self._queue_name)
+        mock_add_leaveempty_call.assert_called_once_with(callid, d1, self._queue_name, waittime)
 
     @patch('xivo_dao.queue_log_dao.get_queue_timeout_call',
            mock_get_timeout_call)
@@ -189,14 +195,16 @@ class TestQueue(unittest.TestCase):
         d2 = (datetime.datetime(2012, 01, 01, 23, 59, 59, 999999)
               .strftime("%Y-%m-%d %H:%M:%S.%f"))
         callid = '1234567.890'
+        waittime = 7
         mock_get_timeout_call.return_value = [{'queue_name': self._queue_name,
                                                'event': 'timeout',
                                                'time': d1,
-                                               'callid': callid}]
+                                               'callid': callid,
+                                               'waittime': waittime}]
 
         queue.fill_timeout_call(d1, d2)
 
-        mock_add_timeout_call.assert_called_once_with(callid, d1, self._queue_name)
+        mock_add_timeout_call.assert_called_once_with(callid, d1, self._queue_name, waittime)
 
     @patch('xivo_stat.queue.fill_abandoned_call', mock_fill_abandoned_call)
     @patch('xivo_stat.queue.fill_answered_call', mock_fill_answered_call)

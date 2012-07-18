@@ -28,7 +28,8 @@ def fill_leaveempty_call(start, end):
     for call in leaveempty_calls:
         stat_call_on_queue_dao.add_leaveempty_call(call['callid'],
                                                    call['time'],
-                                                   call['queue_name'])
+                                                   call['queue_name'],
+                                                   call['waittime'])
 
 
 def fill_abandoned_call(start, end):
@@ -36,7 +37,8 @@ def fill_abandoned_call(start, end):
     for call in abandoned_calls:
         stat_call_on_queue_dao.add_abandoned_call(call['callid'],
                                                   call['time'],
-                                                  call['queue_name'])
+                                                  call['queue_name'],
+                                                  call['waittime'])
 
 
 def fill_closed_call(start, end):
@@ -52,7 +54,8 @@ def fill_answered_call(start, end):
     for call in answered_calls:
         stat_call_on_queue_dao.add_answered_call(call['callid'],
                                                  call['time'],
-                                                 call['queue_name'])
+                                                 call['queue_name'],
+                                                 call['waittime'])
 
 
 def fill_timeout_call(start, end):
@@ -60,7 +63,8 @@ def fill_timeout_call(start, end):
     for call in timeout_calls:
         stat_call_on_queue_dao.add_timeout_call(call['callid'],
                                                 call['time'],
-                                                call['queue_name'])
+                                                call['queue_name'],
+                                                call['waittime'])
 
 
 def fill_calls(start, end):
