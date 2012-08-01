@@ -255,19 +255,21 @@ class TestQueue(unittest.TestCase):
     @patch('xivo_dao.stat_queue_periodic_dao.insert_stats', mock_insert_stats)
     def test_insert_periodic_stat(self):
         s = datetime.datetime(2012, 01, 01)
-        e = datetime.datetime(2012, 01, 01, 4, 59, 59, 999999)
+        e = datetime.datetime(2012, 01, 31, 23, 59, 59, 999999)
 
-        fake_stats = {'stats': 1234}
+        t1 = s
+        t2 = s + datetime.timedelta(hours=1)
 
-        expected_periods = [datetime.datetime(2012, 01, 01, 0),
-                            datetime.datetime(2012, 01, 01, 1),
-                            datetime.datetime(2012, 01, 01, 2),
-                            datetime.datetime(2012, 01, 01, 3),
-                            datetime.datetime(2012, 01, 01, 4)]
-        expected_calls = [call(fake_stats, t) for t in expected_periods]
+        stat1 = {'stats': 1234}
+        stat2 = {'stats': 5555}
+
+        fake_stats = {t1: stat1,
+                      t2: stat2}
 
         mock_get_periodic_stats.return_value = fake_stats
 
         queue.insert_periodic_stat(s, e)
 
-        self.assertEqual(mock_insert_stats.call_args_list, expected_calls)
+        mock_insert_stats.assert_any_call(stat1, t1)
+        mock_insert_stats.assert_any_call(stat2, t2)
+        self.assertEqual(mock_insert_stats.call_count, 2)

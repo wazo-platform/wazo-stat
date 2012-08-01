@@ -74,8 +74,6 @@ def fill_calls(start, end):
 
 
 def insert_periodic_stat(start, end):
-    period = datetime.timedelta(hours=1)
-    for t in xivo_stat.core.gen_time(start, end, period):
-        stats = stat_call_on_queue_dao.get_periodic_stats(
-            t, t + period - datetime.timedelta(microseconds=1))
-        stat_queue_periodic_dao.insert_stats(stats, t)
+    stats = stat_call_on_queue_dao.get_periodic_stats(start, end)
+    for period, stat in stats.iteritems():
+        stat_queue_periodic_dao.insert_stats(stat, period)
