@@ -5,6 +5,7 @@ import sys
 from xivo_dao import stat_queue_periodic_dao, stat_call_on_queue_dao
 from xivo_dao import queue_log_dao
 from xivo_dao import stat_queue_dao
+from xivo_dao import stat_agent_dao
 from xivo_stat import queue
 from sqlalchemy.exc import IntegrityError
 from xivo_dao.alchemy import dbconnection
@@ -72,6 +73,7 @@ def update_db():
     print 'Filling cache into DB'
     try:
         insert_missing_queues(start, end)
+        insert_missing_agents(start)
         queue.fill_calls(start, end)
         queue.insert_periodic_stat(start, end)
     except (IntegrityError, KeyboardInterrupt):
@@ -81,6 +83,11 @@ def update_db():
 def clean_db():
     stat_call_on_queue_dao.clean_table()
     stat_queue_periodic_dao.clean_table()
+
+
+def insert_missing_agents(start):
+    agents = queue_log_dao.get_agents_after(start)
+    stat_agent_dao.insert_if_missing(agents)
 
 
 def insert_missing_queues(start, end):

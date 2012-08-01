@@ -2,7 +2,7 @@
 import datetime
 import unittest
 
-from mock import Mock, patch, call
+from mock import Mock, patch
 
 from xivo_stat import queue
 from xivo_dao.queue_log_dao import CallStart
@@ -114,25 +114,33 @@ class TestQueue(unittest.TestCase):
     def test_fill_answered(self):
         d1 = datetime.datetime(2012, 1, 1, 0, 11)
         d2 = datetime.datetime(2012, 1, 1, 0, 12)
+        t1, t2 = 13, 27
         w1, w2 = 5, 7
+        a1 = 'Agent/1003'
         mock_get_answered_call.return_value = [
             {'queue_name': self._queue_name,
              'event': 'answered',
              'time': d1,
              'callid': '5',
-             'waittime': w1},
+             'waittime': w1,
+             'talktime': t1,
+             'agent': a1,
+             },
             {'queue_name': self._queue_name,
              'event': 'answered',
              'time': d2,
              'callid': '6',
-             'waittime': w2},
+             'waittime': w2,
+             'talktime': t2,
+             'agent': a1,
+             },
             ]
 
         queue.fill_answered_call(self._started_calls)
 
         mock_get_answered_call.assert_called_once_with(self._started_calls)
-        mock_add_answered_call.assert_any_call('5', d1, self._queue_name, w1)
-        mock_add_answered_call.assert_any_call('6', d2, self._queue_name, w2)
+        mock_add_answered_call.assert_any_call('5', d1, self._queue_name, a1, w1, t1)
+        mock_add_answered_call.assert_any_call('6', d2, self._queue_name, a1, w2, t2)
 
     @patch('xivo_dao.queue_log_dao.get_queue_abandoned_call',
            mock_get_abandoned_call)

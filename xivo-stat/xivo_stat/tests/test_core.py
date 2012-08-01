@@ -7,10 +7,13 @@ from xivo_stat import core
 
 mock_end_time = Mock()
 mock_fill_calls = Mock()
+mock_get_agents_after = Mock()
 mock_get_first_time = Mock()
 mock_get_most_recent_time = Mock()
 mock_get_queue_names_in_range = Mock()
+mock_insert_agent_if_missing = Mock()
 mock_insert_if_missing = Mock()
+mock_insert_missing_agents = Mock()
 mock_insert_missing_queues = Mock()
 mock_insert_periodic_stat = Mock()
 mock_start_time = Mock()
@@ -19,9 +22,12 @@ mock_clean_table_stat_queue_periodic = Mock()
 
 mocks = [mock_end_time,
          mock_fill_calls,
+         mock_get_agents_after,
          mock_get_first_time,
          mock_get_most_recent_time,
+         mock_insert_agent_if_missing,
          mock_insert_if_missing,
+         mock_insert_missing_agents,
          mock_insert_missing_queues,
          mock_insert_periodic_stat,
          mock_start_time,
@@ -130,6 +136,7 @@ class TestCore(unittest.TestCase):
     @patch('xivo_stat.queue.insert_periodic_stat',
            mock_insert_periodic_stat)
     @patch('xivo_stat.core.insert_missing_queues', mock_insert_missing_queues)
+    @patch('xivo_stat.core.insert_missing_agents', mock_insert_missing_agents)
     def test_update_db(self):
         start = datetime.datetime(2012, 1, 1)
         end = datetime.datetime(2012, 1, 1, 4, 59, 59, 999999)
@@ -139,6 +146,7 @@ class TestCore(unittest.TestCase):
         core.update_db()
 
         mock_insert_missing_queues.assert_called_once_with(start, end)
+        mock_insert_missing_agents.assert_called_once_with(start)
         mock_fill_calls.assert_called_once_with(start, end)
         mock_insert_periodic_stat.assert_called_once_with(start, end)
 
@@ -161,3 +169,15 @@ class TestCore(unittest.TestCase):
         core.insert_missing_queues(start, end)
 
         mock_insert_if_missing.assert_called_once_with(queue_names)
+
+    @patch('xivo_dao.stat_agent_dao.insert_if_missing', mock_insert_agent_if_missing)
+    @patch('xivo_dao.queue_log_dao.get_agents_after', mock_get_agents_after)
+    def test_insert_missing_agents(self):
+        start = datetime.datetime(2012, 1, 1)
+        agents = ['Agent/1', 'Agent/2']
+        mock_get_agents_after.return_value = agents
+
+        core.insert_missing_agents(start)
+
+        mock_insert_agent_if_missing.assert_called_once_with(agents)
+        mock_get_agents_after.assert_called_once_with(start)

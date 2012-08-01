@@ -1,7 +1,4 @@
 # -*- coding: utf-8 -*-
-import datetime
-import xivo_stat
-
 from xivo_dao import queue_log_dao
 from xivo_dao import stat_call_on_queue_dao
 from xivo_dao import stat_queue_periodic_dao
@@ -46,10 +43,14 @@ def fill_closed_call(started_calls):
 def fill_answered_call(started_calls):
     answered_calls = queue_log_dao.get_queue_answered_call(started_calls)
     for call in answered_calls:
-        stat_call_on_queue_dao.add_answered_call(call['callid'],
-                                                 call['time'],
-                                                 call['queue_name'],
-                                                 call['waittime'])
+        stat_call_on_queue_dao.add_answered_call(
+            call['callid'],
+            call['time'],
+            call['queue_name'],
+            call['agent'],
+            call['waittime'],
+            call['talktime'],
+            )
 
 
 def fill_timeout_call(started_calls):
