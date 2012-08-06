@@ -78,3 +78,8 @@ def insert_periodic_stat(start, end):
     stats = stat_call_on_queue_dao.get_periodic_stats(start, end)
     for period, stat in stats.iteritems():
         stat_queue_periodic_dao.insert_stats(stat, period)
+
+
+def remove_after_start(start):
+    stat_call_on_queue_dao.remove_after(start)
+    stat_queue_periodic_dao.remove_after(start)

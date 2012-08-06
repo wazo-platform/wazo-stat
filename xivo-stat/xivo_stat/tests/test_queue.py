@@ -31,6 +31,8 @@ mock_get_periodic_stats = Mock()
 mock_get_started_calls = Mock()
 mock_insert_periodic_stat = Mock()
 mock_insert_stats = Mock()
+mock_stat_call_on_queue_remove_after = Mock()
+mock_stat_queue_periodic_remove_after = Mock()
 
 
 mocks = [mock_add_abandoned_call,
@@ -53,7 +55,10 @@ mocks = [mock_add_abandoned_call,
          mock_get_periodic_stats,
          mock_get_started_calls,
          mock_insert_periodic_stat,
-         mock_insert_stats]
+         mock_insert_stats,
+         mock_stat_call_on_queue_remove_after,
+         mock_stat_queue_periodic_remove_after,
+         ]
 
 
 class TestQueue(unittest.TestCase):
@@ -281,3 +286,13 @@ class TestQueue(unittest.TestCase):
         mock_insert_stats.assert_any_call(stat1, t1)
         mock_insert_stats.assert_any_call(stat2, t2)
         self.assertEqual(mock_insert_stats.call_count, 2)
+
+    @patch('xivo_dao.stat_call_on_queue_dao.remove_after', mock_stat_call_on_queue_remove_after)
+    @patch('xivo_dao.stat_queue_periodic_dao.remove_after', mock_stat_queue_periodic_remove_after)
+    def test_remove_after_start(self):
+        s = datetime.datetime(2012, 1, 1)
+
+        queue.remove_after_start(s)
+
+        mock_stat_call_on_queue_remove_after.assert_called_once_with(s)
+        mock_stat_queue_periodic_remove_after.assert_called_once_with(s)

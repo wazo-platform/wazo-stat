@@ -75,7 +75,7 @@ class TestCore(unittest.TestCase):
     def test_get_start_time_has_call_on_queue_entry(self):
         mock_get_most_recent_time.return_value = datetime.datetime(2012, 1, 1, 1, 23, 54)
 
-        expected = datetime.datetime(2012, 1, 1, 2, 0, 0)
+        expected = datetime.datetime(2011, 12, 31, 2, 0, 0)
 
         result = core.get_start_time()
 
@@ -88,7 +88,7 @@ class TestCore(unittest.TestCase):
         mock_get_most_recent_time.side_effect = LookupError('Empty table')
         mock_get_first_time.return_value = datetime.datetime(2012, 1, 1, 1, 12, 23, 666)
 
-        expected = datetime.datetime(2012, 1, 1, 1, 0, 0)
+        expected = datetime.datetime(2011, 12, 31, 1, 0, 0)
 
         result = core.get_start_time()
 

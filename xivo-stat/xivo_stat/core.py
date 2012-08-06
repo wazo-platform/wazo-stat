@@ -41,12 +41,13 @@ def end_of_previous_hour(t):
 
 def get_start_time():
     try:
-        return hour_start(stat_queue_periodic_dao.get_most_recent_time()) + DELTA_1HOUR
+        start = hour_start(stat_queue_periodic_dao.get_most_recent_time()) + DELTA_1HOUR
     except LookupError:
         try:
-            return hour_start(queue_log_dao.get_first_time())
+            start = hour_start(queue_log_dao.get_first_time())
         except LookupError:
             raise RuntimeError('No data to generate stats from')
+    return start - datetime.timedelta(days=1)
 
 
 def get_end_time():
@@ -74,6 +75,7 @@ def update_db():
     try:
         insert_missing_queues(start, end)
         insert_missing_agents(start)
+        queue.remove_after_start(start)
         queue.fill_calls(start, end)
         queue.insert_periodic_stat(start, end)
     except (IntegrityError, KeyboardInterrupt):
