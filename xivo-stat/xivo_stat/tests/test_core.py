@@ -137,6 +137,7 @@ class TestCore(unittest.TestCase):
            mock_insert_periodic_stat)
     @patch('xivo_stat.core.insert_missing_queues', mock_insert_missing_queues)
     @patch('xivo_stat.core.insert_missing_agents', mock_insert_missing_agents)
+    @patch('xivo_stat.queue.remove_after_start', Mock())
     def test_update_db(self):
         start = datetime.datetime(2012, 1, 1)
         end = datetime.datetime(2012, 1, 1, 4, 59, 59, 999999)
