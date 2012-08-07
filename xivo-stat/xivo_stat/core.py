@@ -88,10 +88,12 @@ def clean_db():
 
 
 def insert_missing_agents(start):
+    print 'Inserting missing agents'
     agents = queue_log_dao.get_agents_after(start)
     stat_agent_dao.insert_if_missing(agents)
 
 
 def insert_missing_queues(start, end):
+    print 'Inserting missing queues...'
     queue_names = queue_log_dao.get_queue_names_in_range(start, end)
     stat_queue_dao.insert_if_missing(queue_names)

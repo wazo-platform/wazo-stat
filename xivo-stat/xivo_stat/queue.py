@@ -8,6 +8,7 @@ from xivo_dao import stat_queue_periodic_dao
 
 
 def fill_full_call(start, end):
+    print 'Filling full calls...'
     full_calls = queue_log_dao.get_queue_full_call(start, end)
     for call in full_calls:
         stat_call_on_queue_dao.add_full_call(call['callid'],
@@ -16,6 +17,7 @@ def fill_full_call(start, end):
 
 
 def fill_joinempty_call(start, end):
+    print 'Filling join empty calls...'
     joinempty_calls = queue_log_dao.get_queue_joinempty_call(start, end)
     for call in joinempty_calls:
         stat_call_on_queue_dao.add_joinempty_call(call['callid'],
@@ -24,6 +26,7 @@ def fill_joinempty_call(start, end):
 
 
 def fill_leaveempty_call(start, end):
+    print 'Filling leave empty calls...'
     leaveempty_calls = queue_log_dao.get_queue_leaveempty_call(start, end)
     for call in leaveempty_calls:
         stat_call_on_queue_dao.add_leaveempty_call(call['callid'],
@@ -33,6 +36,7 @@ def fill_leaveempty_call(start, end):
 
 
 def fill_abandoned_call(start, end):
+    print 'Filling abandoned calls...'
     abandoned_calls = queue_log_dao.get_queue_abandoned_call(start, end)
     for call in abandoned_calls:
         stat_call_on_queue_dao.add_abandoned_call(call['callid'],
@@ -42,6 +46,7 @@ def fill_abandoned_call(start, end):
 
 
 def fill_closed_call(start, end):
+    print 'Filling closed calls...'
     closed_calls = queue_log_dao.get_queue_closed_call(start, end)
     for call in closed_calls:
         stat_call_on_queue_dao.add_closed_call(call['callid'],
@@ -50,6 +55,7 @@ def fill_closed_call(start, end):
 
 
 def fill_answered_call(start, end):
+    print 'Filling answered calls...'
     answered_calls = queue_log_dao.get_queue_answered_call(start, end)
     for call in answered_calls:
         stat_call_on_queue_dao.add_answered_call(
@@ -63,6 +69,7 @@ def fill_answered_call(start, end):
 
 
 def fill_timeout_call(start, end):
+    print 'Filling timeout calls...'
     timeout_calls = queue_log_dao.get_queue_timeout_call(start, end)
     for call in timeout_calls:
         stat_call_on_queue_dao.add_timeout_call(call['callid'],
@@ -82,11 +89,14 @@ def fill_calls(start, end):
 
 
 def insert_periodic_stat(start, end):
+    print 'Inserting periodic stats'
     periodic_stats = stat_call_on_queue_dao.get_periodic_stats(start, end)
     for period, stats in periodic_stats.iteritems():
+        print period
         stat_queue_periodic_dao.insert_stats(stats, period)
 
 
 def remove_after_start(date):
+    print 'Removing cache after', date
     stat_call_on_queue_dao.remove_after(date)
     stat_queue_periodic_dao.remove_after(date)
