@@ -76,8 +76,10 @@ def update_db():
         insert_missing_queues(start, end)
         insert_missing_agents(start)
         queue.remove_after_start(start)
-        queue.fill_calls(start, end)
-        queue.insert_periodic_stat(start, end)
+        for p in gen_time(start, end, datetime.timedelta(hours=1)):
+            p_end = p + datetime.timedelta(hours=1) - datetime.timedelta(microseconds=1)
+            queue.fill_calls(p, p_end)
+            queue.insert_periodic_stat(p, p_end)
     except (IntegrityError, KeyboardInterrupt):
         _clean_up_after_error()
 
