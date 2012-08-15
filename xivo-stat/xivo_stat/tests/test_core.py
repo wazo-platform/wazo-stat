@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 import unittest
 import datetime
 from mock import Mock
@@ -6,30 +7,22 @@ from mock import patch
 from xivo_stat import core
 
 mock_end_time = Mock()
-mock_fill_calls = Mock()
 mock_get_agents_after = Mock()
 mock_get_first_time = Mock()
 mock_get_most_recent_time = Mock()
 mock_get_queue_names_in_range = Mock()
 mock_insert_agent_if_missing = Mock()
 mock_insert_if_missing = Mock()
-mock_insert_missing_agents = Mock()
-mock_insert_missing_queues = Mock()
-mock_insert_periodic_stat = Mock()
 mock_start_time = Mock()
 mock_clean_table_stat_call_on_queue = Mock()
 mock_clean_table_stat_queue_periodic = Mock()
 
 mocks = [mock_end_time,
-         mock_fill_calls,
          mock_get_agents_after,
          mock_get_first_time,
          mock_get_most_recent_time,
          mock_insert_agent_if_missing,
          mock_insert_if_missing,
-         mock_insert_missing_agents,
-         mock_insert_missing_queues,
-         mock_insert_periodic_stat,
          mock_start_time,
          mock_clean_table_stat_call_on_queue,
          mock_clean_table_stat_queue_periodic]
@@ -129,27 +122,6 @@ class TestCore(unittest.TestCase):
         result = core.get_start_end_time()
 
         self.assertEqual(result, expected)
-
-    @patch('xivo_stat.core.get_start_time', mock_start_time)
-    @patch('xivo_stat.core.get_end_time', mock_end_time)
-    @patch('xivo_stat.queue.fill_calls', mock_fill_calls)
-    @patch('xivo_stat.queue.insert_periodic_stat',
-           mock_insert_periodic_stat)
-    @patch('xivo_stat.core.insert_missing_queues', mock_insert_missing_queues)
-    @patch('xivo_stat.core.insert_missing_agents', mock_insert_missing_agents)
-    @patch('xivo_stat.queue.remove_after_start', Mock())
-    def test_update_db(self):
-        start = datetime.datetime(2012, 1, 1)
-        end = datetime.datetime(2012, 1, 1, 4, 59, 59, 999999)
-        mock_start_time.return_value = start
-        mock_end_time.return_value = end
-
-        core.update_db()
-
-        mock_insert_missing_queues.assert_called_once_with(start, end)
-        mock_insert_missing_agents.assert_called_once_with(start)
-        mock_fill_calls.assert_called_once_with(start, end)
-        mock_insert_periodic_stat.assert_called_once_with(start, end)
 
     @patch('xivo_dao.stat_call_on_queue_dao.clean_table', mock_clean_table_stat_call_on_queue)
     @patch('xivo_dao.stat_queue_periodic_dao.clean_table', mock_clean_table_stat_queue_periodic)
