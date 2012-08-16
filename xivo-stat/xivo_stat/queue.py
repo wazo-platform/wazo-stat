@@ -44,20 +44,6 @@ def fill_closed_call(start, end):
                                                call['queue_name'])
 
 
-def fill_answered_call(start, end):
-    print 'Inserting answered calls...'
-    answered_calls = queue_log_dao.get_queue_answered_call(start, end)
-    for call in answered_calls:
-        stat_call_on_queue_dao.add_answered_call(
-            call['callid'],
-            call['time'],
-            call['queue_name'],
-            call['agent'],
-            call['waittime'],
-            call['talktime'],
-            )
-
-
 def fill_timeout_call(start, end):
     print 'Inserting timeout calls...'
     timeout_calls = queue_log_dao.get_queue_timeout_call(start, end)
@@ -70,7 +56,6 @@ def fill_timeout_call(start, end):
 
 def fill_calls(start, end):
     fill_abandoned_call(start, end)
-    fill_answered_call(start, end)
     fill_closed_call(start, end)
     fill_joinempty_call(start, end)
     fill_leaveempty_call(start, end)
@@ -78,8 +63,10 @@ def fill_calls(start, end):
 
 
 def fill_simple_calls(start, end):
-    print 'Inserting simple calls'
+    print 'Inserting saturated calls...'
     stat_dao.fill_saturated_calls(start, end)
+    print 'Inserting answered calls...'
+    stat_dao.fill_answered_calls(start, end)
 
 
 def insert_periodic_stat(start, end):

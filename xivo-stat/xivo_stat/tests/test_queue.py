@@ -15,7 +15,6 @@ mock_add_joinempty_call = Mock()
 mock_add_leaveempty_call = Mock()
 mock_add_timeout_call = Mock()
 mock_fill_abandoned_call = Mock()
-mock_fill_answered_call = Mock()
 mock_fill_closed_call = Mock()
 mock_fill_joinempty_call = Mock()
 mock_fill_leaveempty_call = Mock()
@@ -41,7 +40,6 @@ mocks = [mock_add_abandoned_call,
          mock_add_joinempty_call,
          mock_add_leaveempty_call,
          mock_fill_abandoned_call,
-         mock_fill_answered_call,
          mock_fill_closed_call,
          mock_fill_joinempty_call,
          mock_fill_leaveempty_call,
@@ -168,7 +166,6 @@ class TestQueue(unittest.TestCase):
         mock_add_timeout_call.assert_called_once_with(callid, d1, self._queue_name, waittime)
 
     @patch('xivo_stat.queue.fill_abandoned_call', mock_fill_abandoned_call)
-    @patch('xivo_stat.queue.fill_answered_call', mock_fill_answered_call)
     @patch('xivo_stat.queue.fill_closed_call', mock_fill_closed_call)
     @patch('xivo_stat.queue.fill_joinempty_call', mock_fill_joinempty_call)
     @patch('xivo_stat.queue.fill_leaveempty_call', mock_fill_leaveempty_call)
@@ -176,10 +173,10 @@ class TestQueue(unittest.TestCase):
     def test_fill_calls(self):
         start = datetime.datetime(2012, 1, 1)
         end = datetime.datetime(2012, 1, 1, 4, 59, 59, 999999)
+
         queue.fill_calls(start, end)
 
         mock_fill_abandoned_call.assert_called_once_with(start, end)
-        mock_fill_answered_call.assert_called_once_with(start, end)
         mock_fill_closed_call.assert_called_once_with(start, end)
         mock_fill_timeout_call.assert_called_once_with(start, end)
         mock_fill_joinempty_call.assert_called_once_with(start, end)
