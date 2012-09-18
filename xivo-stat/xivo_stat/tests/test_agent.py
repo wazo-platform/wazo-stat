@@ -33,15 +33,19 @@ class TestAgent(unittest.TestCase):
         interval_size = ONE_HOUR
 
         expected = {
-            agent_id_1: {
-                dt(2012, 01, 01, 01, 00, 00): timedelta(minutes=50),
-                dt(2012, 01, 01, 02, 00, 00): timedelta(minutes=20),
+            dt(2012, 01, 01, 01, 00, 00): {
+                agent_id_1: timedelta(minutes=50),
+                agent_id_2: ONE_HOUR,
                 },
-            agent_id_2: {
-                dt(2012, 01, 01, 01, 00, 00): ONE_HOUR,
-                dt(2012, 01, 01, 02, 00, 00): ONE_HOUR,
-                dt(2012, 01, 01, 03, 00, 00): ONE_HOUR,
-                dt(2012, 01, 01, 04, 00, 00): ONE_HOUR,
+            dt(2012, 01, 01, 02, 00, 00): {
+                agent_id_1: timedelta(minutes=20),
+                agent_id_2: ONE_HOUR,
+                },
+            dt(2012, 01, 01, 03, 00, 00): {
+                agent_id_2: ONE_HOUR,
+                },
+            dt(2012, 01, 01, 04, 00, 00): {
+                agent_id_2: ONE_HOUR,
                 }
             }
 

@@ -18,30 +18,27 @@ class AgentLoginTimeComputer(object):
         results = {}
 
         for agent, login_sessions in login_sessions_by_agent.iteritems():
-            results[agent] = {}
             for login_start, login_end in login_sessions:
                 touched_periods = time_utils.get_period_start_for_time_range(
                     self.possible_intervals, login_start, login_end)
 
-                self._increase_touched_periods(
-                    results[agent], login_start, login_end, touched_periods)
+                for period_start in touched_periods:
+                    if period_start not in results:
+                        results[period_start] = {}
+                    period_end = period_start + self.interval_size
+                    end_in_interval = min(login_end, period_end)
+                    start_in_interval = max(login_start, period_start)
+                    delta = end_in_interval - start_in_interval
+                    self._add_time_to_agent_in_period(
+                        results[period_start], agent, delta)
 
         return results
 
-    def _increase_touched_periods(self, agent_periods, login_start, login_end, touched_periods):
-        for period_start in touched_periods:
-            period_end = period_start + self.interval_size
-            end_in_interval = min(login_end, period_end)
-            start_in_interval = max(login_start, period_start)
-            delta = copy.deepcopy(end_in_interval - start_in_interval)
-            self._add_time_to_agent_in_period(
-                agent_periods, period_start, delta)
-
-    def _add_time_to_agent_in_period(self, agent_periods, period_start, duration):
+    def _add_time_to_agent_in_period(self, period, agent, duration):
         if duration == timedelta(0):
             return
 
-        if period_start not in agent_periods:
-            agent_periods[period_start] = duration
+        if agent not in period:
+            period[agent] = duration
         else:
-            agent_periods[period_start] += duration
+            period[agent] += duration
