@@ -18,10 +18,11 @@ class TestTimeUtils(unittest.TestCase):
             datetime(2012, 1, 1, 2),
             datetime(2012, 1, 1, 3),
             datetime(2012, 1, 1, 4),
+            datetime(2012, 1, 1, 5),
             ]
 
-        start = datetime(2012, 1, 1, 2, 05, 0)
-        end = datetime(2012, 1, 1, 4, 22)
+        start = datetime(2012, 1, 1, 2, 0, 0)
+        end = datetime(2012, 1, 1, 5, 0)
 
         result = time_utils.get_period_start_for_time_range(
             time_list, start, end)
