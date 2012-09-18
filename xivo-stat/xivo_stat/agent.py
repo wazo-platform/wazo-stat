@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
-from xivo_stat import core
-from xivo_stat import time_utils
 from datetime import timedelta
+
+from xivo_stat import time_utils
 from xivo_dao import stat_agent_periodic_dao
 from xivo_dao import stat_dao
 
@@ -25,7 +25,7 @@ class AgentLoginTimeComputer(object):
         self.start = start
         self.end = end
         self.interval_size = interval_size
-        self.possible_intervals = list(core.gen_time(start, end, interval_size))
+        self.possible_intervals = list(time_utils.gen_time(start, end, interval_size))
 
     def compute_login_time_in_period(self, login_sessions_by_agent):
         results = {}

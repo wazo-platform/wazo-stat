@@ -11,6 +11,7 @@ from datetime import timedelta
 from xivo_stat import agent
 from xivo_dao import stat_dao
 
+
 ONE_HOUR = timedelta(hours=1)
 
 

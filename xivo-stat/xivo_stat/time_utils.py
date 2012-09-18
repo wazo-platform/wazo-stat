@@ -11,3 +11,10 @@ def get_period_start_for_time_range(time_list, start, end):
             bigger = i
 
     return time_list[smaller:bigger]
+
+
+def gen_time(start, end, step):
+    tmp = start
+    while tmp <= end:
+        yield tmp
+        tmp += step

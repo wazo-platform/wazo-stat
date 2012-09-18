@@ -33,18 +33,6 @@ class TestCore(unittest.TestCase):
     def setUp(self):
         map(lambda mock: mock.reset_mock(), mocks)
 
-    def test_gen_time(self):
-        s = datetime.datetime(2012, 1, 1)
-        e = datetime.datetime(2012, 1, 1, 11, 59, 59)
-        i = datetime.timedelta(hours=2)
-
-        expected = [datetime.datetime(2012, 1, 1, hour, 0, 0)
-                    for hour in [0, 2, 4, 6, 8, 10]]
-
-        result = [t for t in core.gen_time(s, e, i)]
-
-        self.assertEqual(result, expected)
-
     def test_hour_start(self):
         t = datetime.datetime(2012, 1, 1, 1, 23, 37)
 

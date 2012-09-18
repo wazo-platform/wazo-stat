@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 import datetime
 import sys
 
@@ -21,13 +22,6 @@ def _session():
 
 
 DELTA_1HOUR = datetime.timedelta(hours=1)
-
-
-def gen_time(start, end, step):
-    tmp = start
-    while tmp <= end:
-        yield tmp
-        tmp += step
 
 
 def hour_start(t):
