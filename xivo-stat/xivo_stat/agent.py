@@ -3,7 +3,20 @@
 from xivo_stat import core
 from xivo_stat import time_utils
 from datetime import timedelta
-import copy
+from xivo_dao import stat_agent_periodic_dao
+from xivo_dao import stat_dao
+
+
+ONE_HOUR = timedelta(hours=1)
+
+
+def insert_periodic_stat(start, end):
+    login_intervals = stat_dao.get_login_intervals_in_range(start, end)
+    login_computer = AgentLoginTimeComputer(start, end, ONE_HOUR)
+    periodic_stats = login_computer.compute_login_time_in_period(login_intervals)
+    for period, stats in periodic_stats.iteritems():
+        print 'Inserting agent periodic stat', period
+        stat_agent_periodic_dao.insert_stats(stats, period)
 
 
 class AgentLoginTimeComputer(object):

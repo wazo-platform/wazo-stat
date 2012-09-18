@@ -2,13 +2,15 @@
 import datetime
 import sys
 
+from xivo_stat import queue
+from xivo_stat import agent
 from xivo_dao import stat_queue_periodic_dao, stat_call_on_queue_dao
 from xivo_dao import queue_log_dao
 from xivo_dao import stat_queue_dao
 from xivo_dao import stat_agent_dao
-from xivo_stat import queue
 from sqlalchemy.exc import IntegrityError
 from xivo_dao.alchemy import dbconnection
+
 
 _DB_NAME = 'asterisk'
 
@@ -77,10 +79,11 @@ def update_db():
         insert_missing_agents(start)
         queue.remove_after_start(start)
         queue.fill_simple_calls(start, end)
-        for p in queue_log_dao.hours_with_calls(start, end):
-            p_end = p + datetime.timedelta(hours=1) - datetime.timedelta(microseconds=1)
-            queue.fill_calls(p, p_end)
-            queue.insert_periodic_stat(p, p_end)
+        for period_start in queue_log_dao.hours_with_calls(start, end):
+            period_end = period_start + datetime.timedelta(hours=1) - datetime.timedelta(microseconds=1)
+            queue.fill_calls(period_start, period_end)
+            queue.insert_periodic_stat(period_start, period_end)
+            agent.insert_periodic_stat(period_start, period_end)
     except (IntegrityError, KeyboardInterrupt):
         _clean_up_after_error()
 
