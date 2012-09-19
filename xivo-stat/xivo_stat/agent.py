@@ -11,11 +11,11 @@ ONE_HOUR = timedelta(hours=1)
 
 
 def insert_periodic_stat(start, end):
+    print 'Inserting agent periodic stat'
     login_intervals = stat_dao.get_login_intervals_in_range(start, end)
     login_computer = AgentLoginTimeComputer(start, end, ONE_HOUR)
     periodic_stats = login_computer.compute_login_time_in_period(login_intervals)
     for period, stats in periodic_stats.iteritems():
-        print 'Inserting agent periodic stat', period
         stat_agent_periodic_dao.insert_stats(stats, period)
 
 

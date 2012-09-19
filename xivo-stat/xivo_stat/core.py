@@ -5,7 +5,9 @@ import sys
 
 from xivo_stat import queue
 from xivo_stat import agent
-from xivo_dao import stat_queue_periodic_dao, stat_call_on_queue_dao
+from xivo_dao import stat_queue_periodic_dao
+from xivo_dao import stat_agent_periodic_dao
+from xivo_dao import stat_call_on_queue_dao
 from xivo_dao import queue_log_dao
 from xivo_dao import stat_queue_dao
 from xivo_dao import stat_agent_dao
@@ -85,6 +87,7 @@ def update_db():
 def clean_db():
     stat_call_on_queue_dao.clean_table()
     stat_queue_periodic_dao.clean_table()
+    stat_agent_periodic_dao.clean_table()
 
 
 def insert_missing_agents(start):

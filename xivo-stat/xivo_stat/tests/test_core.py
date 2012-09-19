@@ -16,6 +16,7 @@ mock_insert_if_missing = Mock()
 mock_start_time = Mock()
 mock_clean_table_stat_call_on_queue = Mock()
 mock_clean_table_stat_queue_periodic = Mock()
+mock_clean_table_stat_agent_periodic = Mock()
 
 mocks = [mock_end_time,
          mock_get_agents_after,
@@ -25,7 +26,9 @@ mocks = [mock_end_time,
          mock_insert_if_missing,
          mock_start_time,
          mock_clean_table_stat_call_on_queue,
-         mock_clean_table_stat_queue_periodic]
+         mock_clean_table_stat_queue_periodic,
+         mock_clean_table_stat_agent_periodic,
+         ]
 
 
 class TestCore(unittest.TestCase):
@@ -113,11 +116,13 @@ class TestCore(unittest.TestCase):
 
     @patch('xivo_dao.stat_call_on_queue_dao.clean_table', mock_clean_table_stat_call_on_queue)
     @patch('xivo_dao.stat_queue_periodic_dao.clean_table', mock_clean_table_stat_queue_periodic)
+    @patch('xivo_dao.stat_agent_periodic_dao.clean_table', mock_clean_table_stat_agent_periodic)
     def test_clean_db(self):
         core.clean_db()
 
         mock_clean_table_stat_call_on_queue.assert_called_with()
         mock_clean_table_stat_queue_periodic.assert_called_with()
+        mock_clean_table_stat_agent_periodic.assert_called_with()
 
     @patch('xivo_dao.queue_log_dao.get_queue_names_in_range', mock_get_queue_names_in_range)
     @patch('xivo_dao.stat_queue_dao.insert_if_missing', mock_insert_if_missing)
