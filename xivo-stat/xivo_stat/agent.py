@@ -55,3 +55,12 @@ class AgentLoginTimeComputer(object):
             period[agent] = duration
         else:
             period[agent] += duration
+
+        period[agent] = self._ignore_multiple_logins(period[agent])
+
+    def _ignore_multiple_logins(self, login_time):
+        """
+        Work around an historical bug in chan_agent.so where you could login multiple times
+        Fixed in XiVO 12.18
+        """
+        return min(login_time, ONE_HOUR)
