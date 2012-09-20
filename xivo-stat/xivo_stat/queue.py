@@ -46,6 +46,6 @@ def insert_periodic_stat(start, end):
 
 
 def remove_after_start(date):
-    print 'Removing cache after', date
+    print 'Removing queue cache after', date
     stat_call_on_queue_dao.remove_after(date)
     stat_queue_periodic_dao.remove_after(date)

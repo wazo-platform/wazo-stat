@@ -15,10 +15,13 @@ ONE_HOUR = timedelta(hours=1)
 
 mock_get_login_intervals_in_range = Mock()
 mock_insert_stats = Mock()
+mock_stat_agent_periodic_remove_after = Mock()
 
 
 mocks = [mock_get_login_intervals_in_range,
-         mock_insert_stats]
+         mock_insert_stats,
+         mock_stat_agent_periodic_remove_after,
+         ]
 
 
 class TestAgent(unittest.TestCase):
@@ -119,3 +122,11 @@ class TestAgentLoginTimeComputer(unittest.TestCase):
         result = computer.compute_login_time_in_period(logins)
 
         self.assertEqual(result, expected)
+
+    @patch('xivo_dao.stat_agent_periodic_dao.remove_after', mock_stat_agent_periodic_remove_after)
+    def test_remove_after_start(self):
+        s = dt(2012, 1, 1)
+
+        agent.remove_after_start(s)
+
+        mock_stat_agent_periodic_remove_after.assert_called_once_with(s)

@@ -74,6 +74,7 @@ def update_db():
         insert_missing_queues(start, end)
         insert_missing_agents(start)
         queue.remove_after_start(start)
+        agent.remove_after_start(start)
         queue.fill_simple_calls(start, end)
         agent.insert_periodic_stat(start, end)
         for period_start in queue_log_dao.hours_with_calls(start, end):

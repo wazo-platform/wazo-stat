@@ -19,6 +19,11 @@ def insert_periodic_stat(start, end):
         stat_agent_periodic_dao.insert_stats(stats, period)
 
 
+def remove_after_start(date):
+    print 'Removing agent cache after', date
+    stat_agent_periodic_dao.remove_after(date)
+
+
 class AgentLoginTimeComputer(object):
 
     def __init__(self, start, end, interval_size):
