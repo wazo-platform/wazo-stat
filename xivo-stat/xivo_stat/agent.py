@@ -27,6 +27,7 @@ def _merge_update_agent_statistics(*args):
 
     return result
 
+
 def insert_periodic_stat(start, end):
     print 'Inserting agent periodic stat'
     time_computer = AgentTimeComputer(start, end, ONE_HOUR)

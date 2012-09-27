@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+
 def get_period_start_for_time_range(time_list, start, end):
     smaller = None
     bigger = None
