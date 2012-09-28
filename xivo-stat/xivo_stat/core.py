@@ -16,14 +16,13 @@ from xivo_dao.alchemy import dbconnection
 
 
 _DB_NAME = 'asterisk'
+_ERASE_TIME_WHEN_STARTING = datetime.timedelta(hours=8)
+DELTA_1HOUR = datetime.timedelta(hours=1)
 
 
 def _session():
     connection = dbconnection.get_connection(_DB_NAME)
     return connection.get_session()
-
-
-DELTA_1HOUR = datetime.timedelta(hours=1)
 
 
 def hour_start(t):
@@ -39,17 +38,17 @@ def end_of_previous_hour(t):
 
 def get_start_time():
     try:
-        start = hour_start(stat_queue_periodic_dao.get_most_recent_time()) + DELTA_1HOUR
+        start = hour_start(stat_queue_periodic_dao.get_most_recent_time())
     except LookupError:
         try:
             start = hour_start(queue_log_dao.get_first_time())
         except LookupError:
             raise RuntimeError('No data to generate stats from')
-    return start - datetime.timedelta(days=1)
+    return start - _ERASE_TIME_WHEN_STARTING
 
 
 def get_end_time():
-    return end_of_previous_hour(datetime.datetime.now())
+    return datetime.datetime.now()
 
 
 def get_start_end_time():
@@ -70,6 +69,7 @@ def update_db():
         return
 
     print 'Filling cache into DB'
+    print 'Start Time: %s, End time: %s' % (start, end)
     try:
         insert_missing_queues(start, end)
         insert_missing_agents(start)

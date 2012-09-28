@@ -5,6 +5,7 @@ import datetime
 from mock import Mock
 from mock import patch
 from xivo_stat import core
+from xivo_stat.core import _ERASE_TIME_WHEN_STARTING
 
 mock_end_time = Mock()
 mock_get_agents_after = Mock()
@@ -59,7 +60,7 @@ class TestCore(unittest.TestCase):
     def test_get_start_time_has_call_on_queue_entry(self):
         mock_get_most_recent_time.return_value = datetime.datetime(2012, 1, 1, 1, 23, 54)
 
-        expected = datetime.datetime(2011, 12, 31, 2, 0, 0)
+        expected = datetime.datetime(2012, 1, 1, 1, 0, 0) - _ERASE_TIME_WHEN_STARTING
 
         result = core.get_start_time()
 
@@ -72,7 +73,7 @@ class TestCore(unittest.TestCase):
         mock_get_most_recent_time.side_effect = LookupError('Empty table')
         mock_get_first_time.return_value = datetime.datetime(2012, 1, 1, 1, 12, 23, 666)
 
-        expected = datetime.datetime(2011, 12, 31, 1, 0, 0)
+        expected = datetime.datetime(2012, 1, 1, 1, 0, 0) - _ERASE_TIME_WHEN_STARTING
 
         result = core.get_start_time()
 
@@ -88,17 +89,11 @@ class TestCore(unittest.TestCase):
         self.assertRaises(RuntimeError, core.get_start_time)
 
     def test_get_end_time(self):
-        now = datetime.datetime.now()
-
-        expected = datetime.datetime(now.year,
-                                     now.month,
-                                     now.day,
-                                     now.hour - 1,
-                                     59, 59, 999999)
+        expected = datetime.datetime.now()
 
         result = core.get_end_time()
 
-        self.assertEqual(result, expected)
+        self.assertTrue(result - expected < datetime.timedelta(seconds=1))
 
     @patch('xivo_stat.core.get_start_time', mock_start_time)
     @patch('xivo_stat.core.get_end_time', mock_end_time)
