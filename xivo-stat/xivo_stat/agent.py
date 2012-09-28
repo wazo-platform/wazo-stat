@@ -68,6 +68,8 @@ class AgentTimeComputer(object):
 
         for agent, sessions in sessions_by_agent.iteritems():
             for time_start, time_end in sessions:
+                if not time_end:
+                    time_end = self.end
                 touched_periods = time_utils.get_period_start_for_time_range(
                     self.possible_intervals, time_start, time_end)
 
