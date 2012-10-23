@@ -5,9 +5,10 @@ from datetime import timedelta
 from xivo_stat import time_utils
 from xivo_dao import stat_agent_periodic_dao
 from xivo_dao import stat_dao
+from xivo_dao import queue_log_dao
 
 
-ONE_HOUR = timedelta(hours=1)
+INTERVAL = timedelta(hours=1)
 
 
 def _merge_update_agent_statistics(*args):
@@ -30,15 +31,20 @@ def _merge_update_agent_statistics(*args):
 
 def insert_periodic_stat(start, end):
     print 'Inserting agent periodic stat'
-    time_computer = AgentTimeComputer(start, end, ONE_HOUR)
+    time_computer = AgentTimeComputer(start, end, INTERVAL)
 
     login_intervals = stat_dao.get_login_intervals_in_range(start, end)
     pause_intervals = stat_dao.get_pause_intervals_in_range(start, end)
 
     periodic_stats_login = time_computer.compute_login_time_in_period(login_intervals)
     periodic_stats_pause = time_computer.compute_pause_time_in_period(pause_intervals)
+    periodic_stats_wrapup = queue_log_dao.get_wrapup_times(start, end, INTERVAL)
 
-    periodic_stats = _merge_update_agent_statistics(periodic_stats_login, periodic_stats_pause)
+    periodic_stats = _merge_update_agent_statistics(
+        periodic_stats_login,
+        periodic_stats_pause,
+        periodic_stats_wrapup,
+    )
 
     for period, stats in periodic_stats.iteritems():
         stat_agent_periodic_dao.insert_stats(stats, period)

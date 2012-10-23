@@ -16,18 +16,24 @@ mock_get_login_intervals_in_range = Mock()
 mock_insert_stats = Mock()
 mock_stat_agent_periodic_remove_after = Mock()
 mock_get_pause_intervals_in_range = Mock()
+mock_get_wrapup_times = Mock()
 
 
-mocks = [mock_get_login_intervals_in_range,
-         mock_insert_stats,
-         mock_stat_agent_periodic_remove_after,
-         mock_get_pause_intervals_in_range
-         ]
+mocks = [
+    mock_get_login_intervals_in_range,
+    mock_insert_stats,
+    mock_stat_agent_periodic_remove_after,
+    mock_get_pause_intervals_in_range,
+    mock_get_wrapup_times,
+]
 
 
 class TestAgent(unittest.TestCase):
 
     def setUp(self):
+        self.reset_mocks()
+
+    def reset_mocks(self):
         map(lambda mock: mock.reset_mock(), mocks)
 
     @patch('xivo_dao.stat_agent_periodic_dao.insert_stats',
@@ -36,6 +42,8 @@ class TestAgent(unittest.TestCase):
            mock_get_login_intervals_in_range)
     @patch('xivo_dao.stat_dao.get_pause_intervals_in_range',
            mock_get_pause_intervals_in_range)
+    @patch('xivo_dao.queue_log_dao.get_wrapup_times',
+           mock_get_wrapup_times)
     def test_insert_periodic_stat(self):
         agent_id_1 = 12
         agent_id_2 = 13
@@ -70,11 +78,17 @@ class TestAgent(unittest.TestCase):
                              'pause_time': ONE_HOUR},
             }
         }
+        wrapups = {
+            dt(2012, 1, 1, 3): {
+                agent_id_1: {'wrapup_time': timedelta(seconds=15)}
+            },
+        }
         start = dt(2012, 01, 01, 01, 00, 00)
         end = dt(2012, 01, 01, 04, 00, 00)
 
         mock_get_login_intervals_in_range.return_value = input_stats
         mock_get_pause_intervals_in_range.return_value = input_stats
+        mock_get_wrapup_times.return_value = wrapups
         time_computer = Mock(agent.AgentTimeComputer)
         time_computer.compute_login_time_in_period.return_value = output_stats
         time_computer.compute_pause_time_in_period.return_value = output_stats
