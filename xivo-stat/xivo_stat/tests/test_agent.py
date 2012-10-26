@@ -12,39 +12,16 @@ from xivo_stat import agent
 ONE_HOUR = timedelta(hours=1)
 
 
-mock_get_login_intervals_in_range = Mock()
-mock_insert_stats = Mock()
-mock_stat_agent_periodic_remove_after = Mock()
-mock_get_pause_intervals_in_range = Mock()
-mock_get_wrapup_times = Mock()
-
-
-mocks = [
-    mock_get_login_intervals_in_range,
-    mock_insert_stats,
-    mock_stat_agent_periodic_remove_after,
-    mock_get_pause_intervals_in_range,
-    mock_get_wrapup_times,
-]
-
-
 class TestAgent(unittest.TestCase):
-
-    def setUp(self):
-        self.reset_mocks()
-
-    def reset_mocks(self):
-        map(lambda mock: mock.reset_mock(), mocks)
-
-    @patch('xivo_dao.stat_agent_periodic_dao.insert_stats',
-           mock_insert_stats)
-    @patch('xivo_dao.stat_dao.get_login_intervals_in_range',
-           mock_get_login_intervals_in_range)
-    @patch('xivo_dao.stat_dao.get_pause_intervals_in_range',
-           mock_get_pause_intervals_in_range)
-    @patch('xivo_dao.queue_log_dao.get_wrapup_times',
-           mock_get_wrapup_times)
-    def test_insert_periodic_stat(self):
+    @patch('xivo_dao.stat_agent_periodic_dao.insert_stats')
+    @patch('xivo_dao.stat_dao.get_login_intervals_in_range')
+    @patch('xivo_dao.stat_dao.get_pause_intervals_in_range')
+    @patch('xivo_dao.queue_log_dao.get_wrapup_times')
+    def test_insert_periodic_stat(self,
+                                  mock_get_wrapup_times,
+                                  mock_get_pause_intervals_in_range,
+                                  mock_get_login_intervals_in_range,
+                                  mock_insert_stats):
         agent_id_1 = 12
         agent_id_2 = 13
         input_stats = {
@@ -224,8 +201,8 @@ class TestAgentLoginTimeComputer(unittest.TestCase):
 
         self.assertEqual(result, expected)
 
-    @patch('xivo_dao.stat_agent_periodic_dao.remove_after', mock_stat_agent_periodic_remove_after)
-    def test_remove_after_start(self):
+    @patch('xivo_dao.stat_agent_periodic_dao.remove_after')
+    def test_remove_after_start(self, mock_stat_agent_periodic_remove_after):
         s = dt(2012, 1, 1)
 
         agent.remove_after_start(s)
