@@ -16,9 +16,9 @@ class TestQueue(unittest.TestCase):
     @patch('xivo_dao.queue_log_dao.get_queue_abandoned_call')
     @patch('xivo_dao.stat_call_on_queue_dao.add_abandoned_call')
     def test_fill_abandoned(self, mock_add_abandoned_call, mock_get_abandoned_call):
-        d1 = (datetime.datetime(2012, 01, 01)
+        d1 = (datetime.datetime(2012, 1, 1)
               .strftime("%Y-%m-%d %H:%M:%S.%f"))
-        d2 = (datetime.datetime(2012, 01, 01, 23, 59, 59, 999999)
+        d2 = (datetime.datetime(2012, 1, 1, 23, 59, 59, 999999)
               .strftime("%Y-%m-%d %H:%M:%S.%f"))
         callid = '1234567.890'
         waittime = 3
@@ -35,9 +35,9 @@ class TestQueue(unittest.TestCase):
     @patch('xivo_dao.queue_log_dao.get_queue_timeout_call')
     @patch('xivo_dao.stat_call_on_queue_dao.add_timeout_call')
     def test_fill_timeout(self, mock_add_timeout_call, mock_get_timeout_call):
-        d1 = (datetime.datetime(2012, 01, 01)
+        d1 = (datetime.datetime(2012, 1, 1)
               .strftime("%Y-%m-%d %H:%M:%S.%f"))
-        d2 = (datetime.datetime(2012, 01, 01, 23, 59, 59, 999999)
+        d2 = (datetime.datetime(2012, 1, 1, 23, 59, 59, 999999)
               .strftime("%Y-%m-%d %H:%M:%S.%f"))
         callid = '1234567.890'
         waittime = 7
@@ -65,8 +65,8 @@ class TestQueue(unittest.TestCase):
     @patch('xivo_dao.stat_call_on_queue_dao.get_periodic_stats')
     @patch('xivo_dao.stat_queue_periodic_dao.insert_stats')
     def test_insert_periodic_stat(self, mock_insert_stats, mock_get_periodic_stats):
-        s = datetime.datetime(2012, 01, 01)
-        e = datetime.datetime(2012, 01, 31, 23, 59, 59, 999999)
+        s = datetime.datetime(2012, 1, 1)
+        e = datetime.datetime(2012, 1, 31, 23, 59, 59, 999999)
 
         t1 = s
         t2 = s + datetime.timedelta(hours=1)

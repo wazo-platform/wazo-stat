@@ -13,6 +13,7 @@ ONE_HOUR = timedelta(hours=1)
 
 
 class TestAgent(unittest.TestCase):
+
     @patch('xivo_dao.stat_agent_periodic_dao.insert_stats')
     @patch('xivo_dao.stat_dao.get_login_intervals_in_range')
     @patch('xivo_dao.stat_dao.get_pause_intervals_in_range')
@@ -26,31 +27,31 @@ class TestAgent(unittest.TestCase):
         agent_id_2 = 13
         input_stats = {
             agent_id_1: [
-                (dt(2012, 01, 01, 01, 05, 00), dt(2012, 01, 01, 01, 15, 00)),
-                (dt(2012, 01, 01, 01, 20, 00), dt(2012, 01, 01, 02, 20, 00)),
+                (dt(2012, 1, 1, 1, 5), dt(2012, 1, 1, 1, 15)),
+                (dt(2012, 1, 1, 1, 20), dt(2012, 1, 1, 2, 20)),
             ],
             agent_id_2: [
-                (dt(2012, 01, 01, 01, 00, 00), dt(2012, 01, 01, 05, 00, 00)),
+                (dt(2012, 1, 1, 1), dt(2012, 1, 1, 5)),
             ]
         }
         output_stats = {
-            dt(2012, 01, 01, 01, 00, 00): {
+            dt(2012, 1, 1, 1): {
                 agent_id_1: {'login_time': timedelta(minutes=50),
                              'pause_time': timedelta(minutes=13)},
                 agent_id_2: {'login_time': ONE_HOUR,
                              'pause_time': timedelta(minutes=13)},
             },
-            dt(2012, 01, 01, 02, 00, 00): {
+            dt(2012, 1, 1, 2): {
                 agent_id_1: {'login_time': timedelta(minutes=20),
                              'pause_time': timedelta(minutes=33)},
                 agent_id_2: {'login_time': ONE_HOUR,
                              'pause_time': timedelta(minutes=13)},
             },
-            dt(2012, 01, 01, 03, 00, 00): {
+            dt(2012, 1, 1, 3): {
                 agent_id_2: {'login_time': ONE_HOUR,
                              'pause_time': ONE_HOUR},
             },
-            dt(2012, 01, 01, 04, 00, 00): {
+            dt(2012, 1, 1, 4): {
                 agent_id_2: {'login_time': ONE_HOUR,
                              'pause_time': ONE_HOUR},
             }
@@ -60,8 +61,8 @@ class TestAgent(unittest.TestCase):
                 agent_id_1: {'wrapup_time': timedelta(seconds=15)}
             },
         }
-        start = dt(2012, 01, 01, 01, 00, 00)
-        end = dt(2012, 01, 01, 04, 00, 00)
+        start = dt(2012, 1, 1, 1)
+        end = dt(2012, 1, 1, 4)
 
         mock_get_login_intervals_in_range.return_value = input_stats
         mock_get_pause_intervals_in_range.return_value = input_stats
@@ -85,7 +86,7 @@ class TestAgentLoginTimeComputer(unittest.TestCase):
         interval_size = ONE_HOUR
 
         period = {
-            dt(2012, 01, 01, 01, 00, 00): {}
+            dt(2012, 1, 1, 1): {}
         }
         agent_id = 1
         time_type = 'pause_time'
@@ -98,59 +99,59 @@ class TestAgentLoginTimeComputer(unittest.TestCase):
         )
 
         expected_result = {
-            dt(2012, 01, 01, 01, 00, 00): {1: {'pause_time': duration}}
+            dt(2012, 1, 1, 1): {1: {'pause_time': duration}}
         }
 
-        computer._add_time_to_agent_in_period(period[dt(2012, 1, 1, 1, 0, 0)], agent_id, time_type, duration)
+        computer._add_time_to_agent_in_period(period[dt(2012, 1, 1, 1)], agent_id, time_type, duration)
 
         self.assertEqual(period, expected_result)
 
     def test_merge_update_agent_statistics(self):
         agent_id_1, agent_id_2 = 12, 23
         stat1 = {
-            dt(2012, 01, 01, 01, 00, 00): {agent_id_1: {'login_time': timedelta(minutes=50)},
-                                           agent_id_2: {'login_time': ONE_HOUR}},
-            dt(2012, 01, 01, 02, 00, 00): {agent_id_1: {'login_time': timedelta(minutes=20)},
-                                           agent_id_2: {'login_time': ONE_HOUR}},
-            dt(2012, 01, 01, 03, 00, 00): {agent_id_2: {'login_time': ONE_HOUR}},
-            dt(2012, 01, 01, 04, 00, 00): {agent_id_2: {'login_time': ONE_HOUR}}
+            dt(2012, 1, 1, 1): {agent_id_1: {'login_time': timedelta(minutes=50)},
+                                agent_id_2: {'login_time': ONE_HOUR}},
+            dt(2012, 1, 1, 2): {agent_id_1: {'login_time': timedelta(minutes=20)},
+                                agent_id_2: {'login_time': ONE_HOUR}},
+            dt(2012, 1, 1, 3): {agent_id_2: {'login_time': ONE_HOUR}},
+            dt(2012, 1, 1, 4): {agent_id_2: {'login_time': ONE_HOUR}}
         }
 
         stat2 = {
-            dt(2012, 01, 01, 01, 00, 00): {
+            dt(2012, 1, 1, 1): {
                 agent_id_1: {'pause_time': timedelta(minutes=13)},
                 agent_id_2: {'pause_time': timedelta(minutes=13)},
             },
-            dt(2012, 01, 01, 02, 00, 00): {
+            dt(2012, 1, 1, 2): {
                 agent_id_1: {'pause_time': timedelta(minutes=33)},
                 agent_id_2: {'pause_time': timedelta(minutes=13)},
             },
-            dt(2012, 01, 01, 03, 00, 00): {
+            dt(2012, 1, 1, 3): {
                 agent_id_2: {'pause_time': ONE_HOUR},
             },
-            dt(2012, 01, 01, 04, 00, 00): {
+            dt(2012, 1, 1, 4): {
                 agent_id_2: {'pause_time': ONE_HOUR},
             }
         }
 
         expected = {
-            dt(2012, 01, 01, 01, 00, 00): {
+            dt(2012, 1, 1, 1): {
                 agent_id_1: {'login_time': timedelta(minutes=50),
                              'pause_time': timedelta(minutes=13)},
                 agent_id_2: {'login_time': ONE_HOUR,
                              'pause_time': timedelta(minutes=13)},
             },
-            dt(2012, 01, 01, 02, 00, 00): {
+            dt(2012, 1, 1, 2): {
                 agent_id_1: {'login_time': timedelta(minutes=20),
                              'pause_time': timedelta(minutes=33)},
                 agent_id_2: {'login_time': ONE_HOUR,
                              'pause_time': timedelta(minutes=13)},
             },
-            dt(2012, 01, 01, 03, 00, 00): {
+            dt(2012, 1, 1, 3): {
                 agent_id_2: {'login_time': ONE_HOUR,
                              'pause_time': ONE_HOUR},
             },
-            dt(2012, 01, 01, 04, 00, 00): {
+            dt(2012, 1, 1, 4): {
                 agent_id_2: {'login_time': ONE_HOUR,
                              'pause_time': ONE_HOUR},
             }
@@ -172,27 +173,27 @@ class TestAgentLoginTimeComputer(unittest.TestCase):
 
         logins = {
             agent_id_1: [
-                (dt(2012, 01, 01, 01, 05, 00), dt(2012, 01, 01, 01, 15, 00)),
-                (dt(2012, 01, 01, 01, 20, 00), dt(2012, 01, 01, 02, 20, 00)),
+                (dt(2012, 1, 1, 1, 5), dt(2012, 1, 1, 1, 15)),
+                (dt(2012, 1, 1, 1, 20), dt(2012, 1, 1, 2, 20)),
             ],
             agent_id_2: [
-                (dt(2012, 01, 01, 01, 00, 00), dt(2012, 01, 01, 05, 00, 00)),
+                (dt(2012, 1, 1, 1), dt(2012, 1, 1, 5)),
             ]
         }
 
         expected = {
-            dt(2012, 01, 01, 01, 00, 00): {
+            dt(2012, 1, 1, 1): {
                 agent_id_1: {'login_time': timedelta(minutes=50)},
                 agent_id_2: {'login_time': ONE_HOUR}
             },
-            dt(2012, 01, 01, 02, 00, 00): {
+            dt(2012, 1, 1, 2): {
                 agent_id_1: {'login_time': timedelta(minutes=20)},
                 agent_id_2: {'login_time': ONE_HOUR}
             },
-            dt(2012, 01, 01, 03, 00, 00): {
+            dt(2012, 1, 1, 3): {
                 agent_id_2: {'login_time': ONE_HOUR}
             },
-            dt(2012, 01, 01, 04, 00, 00): {
+            dt(2012, 1, 1, 4): {
                 agent_id_2: {'login_time': ONE_HOUR}
             }
         }
