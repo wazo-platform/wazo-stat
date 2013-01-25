@@ -3,9 +3,6 @@
 
 from xivo import argparse_cmd
 from xivo_stat import core
-from xivo_dao.alchemy import dbconnection
-
-_DB_URI = 'postgresql://asterisk:proformatique@localhost/asterisk'
 
 
 def main():
@@ -19,15 +16,6 @@ class _XivoStatCommand(argparse_cmd.AbstractCommand):
     def configure_subcommands(self, subcommands):
         subcommands.add_subcommand(_FillDbSubcommand('fill_db'))
         subcommands.add_subcommand(_CleanDbSubcommand('clean_db'))
-
-    def pre_execute(self, parsed_args):
-        db_connection_pool = dbconnection.DBConnectionPool(dbconnection.DBConnection)
-        dbconnection.register_db_connection_pool(db_connection_pool)
-
-        dbconnection.add_connection_as(_DB_URI, 'asterisk')
-
-    def post_execute(self, parsed_args):
-        dbconnection.unregister_db_connection_pool()
 
 
 class _FillDbSubcommand(argparse_cmd.AbstractSubcommand):
