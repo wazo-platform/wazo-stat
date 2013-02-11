@@ -17,7 +17,6 @@
 
 import unittest
 import datetime
-from mock import Mock
 from mock import patch
 from xivo_stat import core
 from xivo_stat.core import _ERASE_TIME_WHEN_STARTING
@@ -93,17 +92,23 @@ class TestCore(unittest.TestCase):
 
         self.assertEqual(result, expected)
 
-    @patch('xivo_dao.stat_call_on_queue_dao.clean_table')
-    @patch('xivo_dao.stat_queue_periodic_dao.clean_table')
+    @patch('xivo_dao.stat_agent_dao.clean_table')
     @patch('xivo_dao.stat_agent_periodic_dao.clean_table')
-    def test_clean_db(self, mock_clean_table_stat_agent_periodic,
-                      mock_clean_table_stat_queue_periodic,
-                      mock_clean_table_stat_call_on_queue):
+    @patch('xivo_dao.stat_call_on_queue_dao.clean_table')
+    @patch('xivo_dao.stat_queue_dao.clean_table')
+    @patch('xivo_dao.stat_queue_periodic_dao.clean_table')
+    def test_clean_db(self, mock_clean_table_stat_queue_periodic,
+                      mock_clean_table_queue_dao,
+                      mock_clean_table_stat_call_on_queue,
+                      mock_clean_table_stat_agent_periodic,
+                      mock_clean_table_stat_agent_dao):
         core.clean_db()
 
-        mock_clean_table_stat_call_on_queue.assert_called_with()
-        mock_clean_table_stat_queue_periodic.assert_called_with()
-        mock_clean_table_stat_agent_periodic.assert_called_with()
+        mock_clean_table_stat_agent_dao.assert_called_once_with()
+        mock_clean_table_stat_agent_periodic.assert_called_once_with()
+        mock_clean_table_stat_call_on_queue.assert_called_once_with()
+        mock_clean_table_queue_dao.assert_called_once_with()
+        mock_clean_table_stat_queue_periodic.assert_called_once_with()
 
     @patch('xivo_dao.queue_log_dao.get_queue_names_in_range')
     @patch('xivo_dao.stat_queue_dao.insert_if_missing')

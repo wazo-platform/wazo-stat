@@ -102,8 +102,10 @@ def update_db():
 
 def clean_db():
     stat_call_on_queue_dao.clean_table()
-    stat_queue_periodic_dao.clean_table()
     stat_agent_periodic_dao.clean_table()
+    stat_queue_periodic_dao.clean_table()
+    stat_agent_dao.clean_table()
+    stat_queue_dao.clean_table()
 
 
 def insert_missing_agents(start):
