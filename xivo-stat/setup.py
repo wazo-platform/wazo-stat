@@ -11,6 +11,7 @@ setup(
     author_email='dev@avencall.com',
     url='http://git.xivo.fr/',
     license='GPLv3',
-    packages=['xivo_stat'],
+    packages=['xivo_stat',
+              'xivo_stat.bin'],
     scripts=['bin/xivo-stat'],
 )

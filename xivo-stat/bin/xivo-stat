@@ -1,36 +1,5 @@
-#!/usr/bin/python
-# -*- coding: utf8 -*-
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 
-from xivo import argparse_cmd
-from xivo_stat import core
-
-
-def main():
-    argparse_cmd.execute_command(_XivoStatCommand())
-
-
-class _XivoStatCommand(argparse_cmd.AbstractCommand):
-    def configure_parser(self, parser):
-        pass
-
-    def configure_subcommands(self, subcommands):
-        subcommands.add_subcommand(_FillDbSubcommand('fill_db'))
-        subcommands.add_subcommand(_CleanDbSubcommand('clean_db'))
-
-
-class _FillDbSubcommand(argparse_cmd.AbstractSubcommand):
-    def configure_parser(self, parser):
-        pass
-
-    def execute(self, parsed_args):
-        core.update_db()
-
-
-class _CleanDbSubcommand(argparse_cmd.AbstractSubcommand):
-
-    def execute(self, parsed_args):
-        core.clean_db()
-
-
-if __name__ == '__main__':
-    main()
+from xivo_stat.bin.stat import main
+main()
