@@ -87,7 +87,7 @@ def update_db():
     print 'Start Time: %s, End time: %s' % (start, end)
     try:
         insert_missing_queues(start, end)
-        insert_missing_agents(start)
+        insert_missing_agents()
         queue.remove_after_start(start)
         agent.remove_after_start(start)
         queue.fill_simple_calls(start, end)
@@ -108,10 +108,9 @@ def clean_db():
     stat_queue_dao.clean_table()
 
 
-def insert_missing_agents(start):
-    print 'Inserting missing agents'
-    agents = queue_log_dao.get_agents_after(start)
-    stat_agent_dao.insert_if_missing(agents)
+def insert_missing_agents():
+    print 'Inserting missing agents...'
+    stat_agent_dao.insert_missing_agents()
 
 
 def insert_missing_queues(start, end):

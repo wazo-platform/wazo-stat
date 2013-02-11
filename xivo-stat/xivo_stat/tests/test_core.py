@@ -122,14 +122,8 @@ class TestCore(unittest.TestCase):
 
         mock_insert_if_missing.assert_called_once_with(queue_names)
 
-    @patch('xivo_dao.stat_agent_dao.insert_if_missing')
-    @patch('xivo_dao.queue_log_dao.get_agents_after')
-    def test_insert_missing_agents(self, mock_get_agents_after, mock_insert_agent_if_missing):
-        start = datetime.datetime(2012, 1, 1)
-        agents = ['Agent/1', 'Agent/2']
-        mock_get_agents_after.return_value = agents
+    @patch('xivo_dao.stat_agent_dao.insert_missing_agents')
+    def test_insert_missing_agents(self, mock_insert_agent_if_missing):
+        core.insert_missing_agents()
 
-        core.insert_missing_agents(start)
-
-        mock_insert_agent_if_missing.assert_called_once_with(agents)
-        mock_get_agents_after.assert_called_once_with(start)
+        mock_insert_agent_if_missing.assert_called_once_with()
