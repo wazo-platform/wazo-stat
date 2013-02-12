@@ -15,6 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
+import logging
 from xivo import argparse_cmd
 from xivo_stat import core
 
@@ -24,6 +25,16 @@ def main():
 
 
 class _XivoStatCommand(argparse_cmd.AbstractCommand):
+
+    def pre_execute(self, parsed_args):
+        self._init_logging()
+
+    def _init_logging(self):
+        root_logger = logging.getLogger()
+        root_logger.setLevel(logging.INFO)
+        handler = logging.StreamHandler()
+        handler.setFormatter(logging.Formatter('%(asctime)s: %(message)s'))
+        root_logger.addHandler(handler)
 
     def configure_subcommands(self, subcommands):
         subcommands.add_subcommand(_FillDbSubcommand('fill_db'))

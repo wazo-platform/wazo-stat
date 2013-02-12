@@ -15,6 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
+import logging
 import datetime
 import sys
 
@@ -29,6 +30,7 @@ from xivo_dao import stat_agent_dao
 from sqlalchemy.exc import IntegrityError
 from xivo_dao.alchemy import dbconnection
 
+logger = logging.getLogger(__name__)
 
 _DB_NAME = 'asterisk'
 _ERASE_TIME_WHEN_STARTING = datetime.timedelta(hours=8)
@@ -71,7 +73,7 @@ def get_start_end_time():
 
 
 def _clean_up_after_error():
-    print 'Inconsistent cache, cleaning up...'
+    logger.info('Inconsistent cache, cleaning up...')
     _session().rollback()
     clean_db()
     sys.exit(1)
@@ -83,8 +85,8 @@ def update_db():
     except RuntimeError:
         return
 
-    print 'Filling cache into DB'
-    print 'Start Time: %s, End time: %s' % (start, end)
+    logger.info('Filling cache into DB')
+    logger.info('Start Time: %s, End time: %s', start, end)
     try:
         insert_missing_queues(start, end)
         insert_missing_agents()
@@ -109,11 +111,11 @@ def clean_db():
 
 
 def insert_missing_agents():
-    print 'Inserting missing agents...'
+    logger.info('Inserting missing agents...')
     stat_agent_dao.insert_missing_agents()
 
 
 def insert_missing_queues(start, end):
-    print 'Inserting missing queues...'
+    logger.info('Inserting missing queues...')
     queue_names = queue_log_dao.get_queue_names_in_range(start, end)
     stat_queue_dao.insert_if_missing(queue_names)

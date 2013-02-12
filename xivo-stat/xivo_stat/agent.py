@@ -15,12 +15,14 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
+import logging
 from datetime import timedelta
 
 from xivo_stat import time_utils
 from xivo_dao import stat_dao, stat_agent_periodic_dao
 from xivo_dao import queue_log_dao
 
+logger = logging.getLogger(__name__)
 
 INTERVAL = timedelta(hours=1)
 
@@ -44,7 +46,7 @@ def _merge_update_agent_statistics(*args):
 
 
 def insert_periodic_stat(start, end):
-    print 'Inserting agent periodic stat'
+    logger.info('Inserting agent periodic stat')
     time_computer = AgentTimeComputer(start, end, INTERVAL)
 
     login_intervals = stat_dao.get_login_intervals_in_range(start, end)
@@ -65,7 +67,7 @@ def insert_periodic_stat(start, end):
 
 
 def remove_after_start(date):
-    print 'Removing agent cache after', date
+    logger.info('Removing agent cache after %s', date)
     stat_agent_periodic_dao.remove_after(date)
 
 

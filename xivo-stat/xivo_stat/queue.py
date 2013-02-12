@@ -15,10 +15,14 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
+import logging
+
 from xivo_dao import queue_log_dao
 from xivo_dao import stat_dao
 from xivo_dao import stat_call_on_queue_dao
 from xivo_dao import stat_queue_periodic_dao
+
+logger = logging.getLogger(__name__)
 
 
 def fill_abandoned_call(start, end):
@@ -45,22 +49,22 @@ def fill_calls(start, end):
 
 
 def fill_simple_calls(start, end):
-    print 'Inserting simple calls...'
+    logger.info('Inserting simple calls...')
     stat_dao.fill_simple_calls(start, end)
-    print 'Inserting answered calls...'
+    logger.info('Inserting answered calls...')
     stat_dao.fill_answered_calls(start, end)
-    print 'Inserting leaveempty calls...'
+    logger.info('Inserting leaveempty calls...')
     stat_dao.fill_leaveempty_calls(start, end)
 
 
 def insert_periodic_stat(start, end):
     periodic_stats = stat_call_on_queue_dao.get_periodic_stats(start, end)
     for period, stats in periodic_stats.iteritems():
-        print 'Inserting queue periodic stat', period
+        logger.info('Inserting queue periodic stat %s', period)
         stat_queue_periodic_dao.insert_stats(stats, period)
 
 
 def remove_after_start(date):
-    print 'Removing queue cache after', date
+    logger.info('Removing queue cache after %s', date)
     stat_call_on_queue_dao.remove_after(date)
     stat_queue_periodic_dao.remove_after(date)
