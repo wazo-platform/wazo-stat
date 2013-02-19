@@ -28,18 +28,11 @@ from xivo_dao import queue_log_dao
 from xivo_dao import stat_queue_dao
 from xivo_dao import stat_agent_dao
 from sqlalchemy.exc import IntegrityError
-from xivo_dao.alchemy import dbconnection
 
 logger = logging.getLogger(__name__)
 
-_DB_NAME = 'asterisk'
 _ERASE_TIME_WHEN_STARTING = datetime.timedelta(hours=8)
 DELTA_1HOUR = datetime.timedelta(hours=1)
-
-
-def _session():
-    connection = dbconnection.get_connection(_DB_NAME)
-    return connection.get_session()
 
 
 def hour_start(t):
@@ -74,7 +67,6 @@ def get_start_end_time():
 
 def _clean_up_after_error():
     logger.info('Inconsistent cache, cleaning up...')
-    _session().rollback()
     clean_db()
     sys.exit(1)
 
