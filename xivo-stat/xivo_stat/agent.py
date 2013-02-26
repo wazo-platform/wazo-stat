@@ -49,12 +49,14 @@ def insert_periodic_stat(dao_sess, start, end):
     logger.info('Inserting agent periodic stat')
     time_computer = AgentTimeComputer(start, end, INTERVAL)
 
+    dao_sess.begin()
     login_intervals = stat_dao.get_login_intervals_in_range(dao_sess, start, end)
     pause_intervals = stat_dao.get_pause_intervals_in_range(dao_sess, start, end)
 
     periodic_stats_login = time_computer.compute_login_time_in_period(login_intervals)
     periodic_stats_pause = time_computer.compute_pause_time_in_period(pause_intervals)
     periodic_stats_wrapup = queue_log_dao.get_wrapup_times(dao_sess, start, end, INTERVAL)
+    dao_sess.commit()
 
     periodic_stats = _merge_update_agent_statistics(
         periodic_stats_login,
@@ -62,8 +64,10 @@ def insert_periodic_stat(dao_sess, start, end):
         periodic_stats_wrapup,
     )
 
+    dao_sess.begin()
     for period, stats in periodic_stats.iteritems():
         stat_agent_periodic_dao.insert_stats(dao_sess, stats, period)
+    dao_sess.commit()
 
 
 def remove_after_start(dao_sess, date):

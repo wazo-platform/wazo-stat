@@ -93,13 +93,12 @@ def update_db():
         queue.fill_simple_calls(dao_sess, start, end)
         dao_sess.commit()
 
-        dao_sess.begin()
         agent.insert_periodic_stat(dao_sess, start, end)
+
         for period_start in queue_log_dao.hours_with_calls(dao_sess, start, end):
             period_end = period_start + datetime.timedelta(hours=1) - datetime.timedelta(microseconds=1)
             queue.fill_calls(dao_sess, period_start, period_end)
             queue.insert_periodic_stat(dao_sess, period_start, period_end)
-        dao_sess.commit()
     except (IntegrityError, KeyboardInterrupt):
         _clean_up_after_error()
 
