@@ -23,6 +23,9 @@ from datetime import datetime as dt
 from datetime import timedelta
 
 from xivo_stat import agent
+from xivo_dao.helpers.db_manager import session
+
+dao_sess = session()
 
 ONE_HOUR = timedelta(hours=1)
 
@@ -86,7 +89,7 @@ class TestAgent(unittest.TestCase):
         time_computer.compute_login_time_in_period.return_value = output_stats
         time_computer.compute_pause_time_in_period.return_value = output_stats
 
-        agent.insert_periodic_stat(start, end)
+        agent.insert_periodic_stat(dao_sess, start, end)
 
         for period_start, agents_stats in output_stats.iteritems():
             mock_insert_stats.assert_any_calls(
@@ -221,6 +224,6 @@ class TestAgentLoginTimeComputer(unittest.TestCase):
     def test_remove_after_start(self, mock_stat_agent_periodic_remove_after):
         s = dt(2012, 1, 1)
 
-        agent.remove_after_start(s)
+        agent.remove_after_start(dao_sess, s)
 
-        mock_stat_agent_periodic_remove_after.assert_called_once_with(s)
+        mock_stat_agent_periodic_remove_after.assert_called_once_with(dao_sess, s)
