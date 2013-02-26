@@ -28,11 +28,13 @@ from xivo_dao import queue_log_dao
 from xivo_dao import stat_queue_dao
 from xivo_dao import stat_agent_dao
 from sqlalchemy.exc import IntegrityError
+from xivo_dao.helpers.db_manager import session
 
 logger = logging.getLogger(__name__)
 
 _ERASE_TIME_WHEN_STARTING = datetime.timedelta(hours=8)
 DELTA_1HOUR = datetime.timedelta(hours=1)
+dao_sess = session()
 
 
 def hour_start(t):
@@ -48,10 +50,10 @@ def end_of_previous_hour(t):
 
 def get_start_time():
     try:
-        start = hour_start(stat_queue_periodic_dao.get_most_recent_time())
+        start = hour_start(stat_queue_periodic_dao.get_most_recent_time(dao_sess))
     except LookupError:
         try:
-            start = hour_start(queue_log_dao.get_first_time())
+            start = hour_start(queue_log_dao.get_first_time(dao_sess))
         except LookupError:
             raise RuntimeError('No data to generate stats from')
     return start - _ERASE_TIME_WHEN_STARTING
@@ -80,34 +82,42 @@ def update_db():
     logger.info('Filling cache into DB')
     logger.info('Start Time: %s, End time: %s', start, end)
     try:
+        dao_sess.begin()
         insert_missing_queues(start, end)
         insert_missing_agents()
-        queue.remove_after_start(start)
-        agent.remove_after_start(start)
-        queue.fill_simple_calls(start, end)
-        agent.insert_periodic_stat(start, end)
-        for period_start in queue_log_dao.hours_with_calls(start, end):
+        dao_sess.commit()
+
+        dao_sess.begin()
+        queue.remove_after_start(dao_sess, start)
+        agent.remove_after_start(dao_sess, start)
+        queue.fill_simple_calls(dao_sess, start, end)
+        dao_sess.commit()
+
+        dao_sess.begin()
+        agent.insert_periodic_stat(dao_sess, start, end)
+        for period_start in queue_log_dao.hours_with_calls(dao_sess, start, end):
             period_end = period_start + datetime.timedelta(hours=1) - datetime.timedelta(microseconds=1)
-            queue.fill_calls(period_start, period_end)
-            queue.insert_periodic_stat(period_start, period_end)
+            queue.fill_calls(dao_sess, period_start, period_end)
+            queue.insert_periodic_stat(dao_sess, period_start, period_end)
+        dao_sess.commit()
     except (IntegrityError, KeyboardInterrupt):
         _clean_up_after_error()
 
 
 def clean_db():
-    stat_call_on_queue_dao.clean_table()
-    stat_agent_periodic_dao.clean_table()
-    stat_queue_periodic_dao.clean_table()
-    stat_agent_dao.clean_table()
-    stat_queue_dao.clean_table()
+    stat_call_on_queue_dao.clean_table(dao_sess)
+    stat_agent_periodic_dao.clean_table(dao_sess)
+    stat_queue_periodic_dao.clean_table(dao_sess)
+    stat_agent_dao.clean_table(dao_sess)
+    stat_queue_dao.clean_table(dao_sess)
 
 
 def insert_missing_agents():
     logger.info('Inserting missing agents...')
-    stat_agent_dao.insert_missing_agents()
+    stat_agent_dao.insert_missing_agents(dao_sess)
 
 
 def insert_missing_queues(start, end):
     logger.info('Inserting missing queues...')
-    queue_names = queue_log_dao.get_queue_names_in_range(start, end)
-    stat_queue_dao.insert_if_missing(queue_names)
+    queue_names = queue_log_dao.get_queue_names_in_range(dao_sess, start, end)
+    stat_queue_dao.insert_if_missing(dao_sess, queue_names)
