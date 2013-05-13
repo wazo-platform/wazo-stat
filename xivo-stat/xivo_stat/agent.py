@@ -89,7 +89,7 @@ class AgentTimeComputer(object):
     def compute_pause_time_in_period(self, sessions_by_agent):
         return self._compute_time_in_period('pause_time', sessions_by_agent)
 
-    def _compute_time_in_period(self, type, sessions_by_agent):
+    def _compute_time_in_period(self, time_type, sessions_by_agent):
         results = {}
 
         for agent, sessions in sessions_by_agent.iteritems():
@@ -107,7 +107,7 @@ class AgentTimeComputer(object):
                     start_in_interval = max(time_start, period_start)
                     delta = end_in_interval - start_in_interval
                     self._add_time_to_agent_in_period(
-                        results[period_start], agent, type, delta)
+                        results[period_start], agent, time_type, delta)
 
         return results
 

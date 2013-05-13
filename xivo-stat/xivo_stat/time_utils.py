@@ -15,6 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
+
 def get_period_start_for_time_range(time_list, start, end):
     smaller = None
     bigger = None
