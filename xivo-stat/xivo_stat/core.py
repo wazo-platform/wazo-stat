@@ -28,13 +28,13 @@ from xivo_dao import queue_log_dao
 from xivo_dao import stat_queue_dao
 from xivo_dao import stat_agent_dao
 from sqlalchemy.exc import IntegrityError
-from xivo_dao.helpers.db_manager import session
+from xivo_dao.helpers.db_manager import AsteriskSession
 
 logger = logging.getLogger(__name__)
 
 _ERASE_TIME_WHEN_STARTING = datetime.timedelta(hours=8)
 DELTA_1HOUR = datetime.timedelta(hours=1)
-dao_sess = session()
+dao_sess = AsteriskSession()
 
 
 def hour_start(t):

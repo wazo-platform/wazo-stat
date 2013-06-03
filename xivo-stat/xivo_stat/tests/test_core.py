@@ -20,9 +20,9 @@ import datetime
 from mock import patch
 from xivo_stat import core
 from xivo_stat.core import _ERASE_TIME_WHEN_STARTING
-from xivo_dao.helpers.db_manager import session
+from xivo_dao.helpers.db_manager import AsteriskSession
 
-dao_sess = session()
+dao_sess = AsteriskSession()
 
 
 class TestCore(unittest.TestCase):
