@@ -61,7 +61,7 @@ def fill_simple_calls(dao_sess, start, end):
 
 def insert_periodic_stat(dao_sess, start, end):
     dao_sess.begin()
-    periodic_stats = stat_call_on_queue_dao.get_periodic_stats(dao_sess, start, end)
+    periodic_stats = stat_call_on_queue_dao.get_periodic_stats_hour(dao_sess, start, end)
     dao_sess.commit()
 
     dao_sess.begin()
