@@ -15,7 +15,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-import errno
 import sys
 import unittest
 
@@ -26,32 +25,24 @@ from xivo_stat.bin import stat
 
 class TestMain(unittest.TestCase):
 
-    @patch('xivo_stat.bin.stat._is_already_running', Mock(return_value=True))
+    @patch('xivo.pid_file.is_already_running', Mock(return_value=True))
     @patch('xivo.argparse_cmd.execute_command', Mock(side_effect=AssertionError('Should not be called')))
     def test_main_already_running(self):
         self.assertRaises(SystemExit, stat.main)
 
-    @patch('xivo_stat.bin.stat._is_already_running', Mock(return_value=False))
-    @patch('xivo_stat.bin.stat._add_pid_file', Mock())
+    @patch('xivo.pid_file.is_already_running', Mock(return_value=False))
+    @patch('xivo.pid_file.add_pid_file', Mock())
     @patch('xivo.argparse_cmd.execute_command')
     def test_main_not_running(self, mock_execute_command):
         stat.main()
 
         self.assertEqual(mock_execute_command.call_count, 1)
 
-    @patch('xivo_stat.bin.stat._is_already_running', Mock(return_value=False))
-    @patch('xivo_stat.bin.stat._add_pid_file', Mock())
+    @patch('xivo.pid_file.is_already_running', Mock(return_value=False))
+    @patch('xivo.pid_file.add_pid_file', Mock())
     @patch('xivo.argparse_cmd.execute_command', Mock(side_effect=lambda _: sys.exit(1)))
-    @patch('xivo_stat.bin.stat._remove_pid_file')
+    @patch('xivo.pid_file.remove_pid_file')
     def test_pidfile_removed_on_error(self, mock_remove_pid_file):
         stat.main()
 
         self.assertEqual(mock_remove_pid_file.call_count, 1)
-
-    @patch('os.unlink', Mock(side_effect=OSError(errno.ENOENT, 'msg')))
-    def test_remove_pid_file_no_such_file_no_error(self):
-        stat._remove_pid_file('/foo/bar')
-
-    @patch('os.unlink', Mock(side_effect=OSError(errno.EACCES, 'msg')))
-    def test_remove_pid_file_other_errno(self):
-        self.assertRaises(OSError, stat._remove_pid_file, '/foo/bar')
