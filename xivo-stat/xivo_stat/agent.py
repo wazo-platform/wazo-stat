@@ -24,7 +24,7 @@ from xivo_dao import queue_log_dao
 
 logger = logging.getLogger(__name__)
 
-INTERVAL = timedelta(minutes=15)
+INTERVAL = timedelta(hours=1)
 
 
 def _merge_update_agent_statistics(*args):
