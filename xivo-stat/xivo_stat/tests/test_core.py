@@ -75,27 +75,6 @@ class TestCore(unittest.TestCase):
 
         self.assertRaises(RuntimeError, core.get_start_time)
 
-    def test_get_end_time(self):
-        expected = datetime.datetime.now()
-
-        result = core.get_end_time()
-
-        self.assertTrue(result - expected < datetime.timedelta(seconds=1))
-
-    @patch('xivo_stat.core.get_start_time')
-    @patch('xivo_stat.core.get_end_time')
-    def test_get_start_end_time(self, mock_end_time, mock_start_time):
-        s = datetime.datetime(2012, 1, 1)
-        e = datetime.datetime(2012, 1, 2)
-        mock_start_time.return_value = s
-        mock_end_time.return_value = e
-
-        expected = s, e
-
-        result = core.get_start_end_time()
-
-        self.assertEqual(result, expected)
-
     @patch('xivo_dao.stat_agent_dao.clean_table')
     @patch('xivo_dao.stat_agent_periodic_dao.clean_table')
     @patch('xivo_dao.stat_call_on_queue_dao.clean_table')

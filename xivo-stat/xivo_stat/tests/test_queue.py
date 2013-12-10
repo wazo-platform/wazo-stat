@@ -103,12 +103,38 @@ class TestQueue(unittest.TestCase):
         mock_insert_stats.assert_any_call(dao_sess, stat2, t2)
         self.assertEqual(mock_insert_stats.call_count, 2)
 
-    @patch('xivo_dao.stat_call_on_queue_dao.remove_after')
+    @patch('xivo_dao.stat_call_on_queue_dao.remove_callids')
+    @patch('xivo_dao.stat_call_on_queue_dao.find_all_callid_between_date')
     @patch('xivo_dao.stat_queue_periodic_dao.remove_after')
-    def test_remove_after_start(self, mock_stat_queue_periodic_remove_after, mock_stat_call_on_queue_remove_after):
-        s = datetime.datetime(2012, 1, 1)
+    def test_remove_between(self,
+                            mock_stat_queue_periodic_remove_after,
+                            mock_find_all_callid_between_date,
+                            mock_remove_callids):
+        start = datetime.datetime(2012, 1, 1)
+        end = datetime.datetime(2012, 1, 1, 23, 59, 59)
+        callids = [1, 2, 3]
 
-        queue.remove_after_start(dao_sess, s)
+        mock_find_all_callid_between_date.return_value = callids
 
-        mock_stat_call_on_queue_remove_after.assert_called_once_with(dao_sess, s)
-        mock_stat_queue_periodic_remove_after.assert_called_once_with(dao_sess, s)
+        queue.remove_between(dao_sess, start, end)
+
+        mock_find_all_callid_between_date.assert_called_once_with(dao_sess, start, end)
+        mock_remove_callids.assert_called_once_with(dao_sess, callids)
+
+    @patch('xivo_dao.stat_call_on_queue_dao.remove_callids')
+    @patch('xivo_dao.stat_call_on_queue_dao.find_all_callid_between_date')
+    @patch('xivo_dao.stat_queue_periodic_dao.remove_after')
+    def test_remove_between_no_calls(self,
+                            mock_stat_queue_periodic_remove_after,
+                            mock_find_all_callid_between_date,
+                            mock_remove_callids):
+        start = datetime.datetime(2012, 1, 1)
+        end = datetime.datetime(2012, 1, 1, 23, 59, 59)
+        callids = []
+
+        mock_find_all_callid_between_date.return_value = callids
+
+        queue.remove_between(dao_sess, start, end)
+
+        mock_find_all_callid_between_date.assert_called_once_with(dao_sess, start, end)
+        self.assertEqual(mock_remove_callids.call_count, 0)

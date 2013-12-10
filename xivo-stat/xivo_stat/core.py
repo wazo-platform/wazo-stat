@@ -85,7 +85,7 @@ def update_db(end_date, start_date=None):
         dao_sess.commit()
 
         dao_sess.begin()
-        queue.remove_after_start(dao_sess, start)
+        queue.remove_between(dao_sess, start, end)
         agent.remove_after_start(dao_sess, start)
         queue.fill_simple_calls(dao_sess, start, end)
         dao_sess.commit()
