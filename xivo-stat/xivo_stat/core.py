@@ -59,25 +59,22 @@ def get_start_time():
     return start - _ERASE_TIME_WHEN_STARTING
 
 
-def get_end_time():
-    return datetime.datetime.now()
-
-
-def get_start_end_time():
-    return get_start_time(), get_end_time()
-
-
 def _clean_up_after_error():
     logger.info('Inconsistent cache, cleaning up...')
     clean_db()
     sys.exit(1)
 
 
-def update_db():
-    try:
-        start, end = get_start_end_time()
-    except RuntimeError:
-        return
+def update_db(end_date, start_date=None):
+    if start_date is None:
+        try:
+            start = get_start_time()
+        except RuntimeError:
+            return
+    else:
+        start = datetime.datetime.strptime(start_date, '%Y-%m-%dT%H:%M:%S')
+
+    end = datetime.datetime.strptime(end_date, '%Y-%m-%dT%H:%M:%S')
 
     logger.info('Filling cache into DB')
     logger.info('Start Time: %s, End time: %s', start, end)

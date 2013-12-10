@@ -15,8 +15,12 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
+import argparse
 import logging
+import re
 import sys
+
+from datetime import datetime
 
 from xivo import argparse_cmd, pid_file
 from xivo_stat import core
@@ -52,12 +56,32 @@ class _XivoStatCommand(argparse_cmd.AbstractCommand):
 
 
 class _FillDbSubcommand(argparse_cmd.AbstractSubcommand):
+    _HELP_DATETIME_FORMAT = '%%Y-%%m-%%dT%%H:%%M:%%S'
+    _DATETIME_FORMAT = '%Y-%m-%dT%H:%M:%S'
 
-    def execute(self, _):
-        core.update_db()
+    def configure_parser(self, parser):
+        parser.add_argument('--start',
+                            type=_datetime_iso,
+                            help='Start date to generate the statistics using this format: %s' % self._HELP_DATETIME_FORMAT)
+        parser.add_argument('--end',
+                            type=_datetime_iso,
+                            default=datetime.now().strftime(self._DATETIME_FORMAT),
+                            help='End date to generate the statistics using this format: %s' % self._HELP_DATETIME_FORMAT)
+
+    def execute(self, parsed_args):
+        core.update_db(start_date=parsed_args.start,
+                       end_date=parsed_args.end)
 
 
 class _CleanDbSubcommand(argparse_cmd.AbstractSubcommand):
 
     def execute(self, _):
         core.clean_db()
+
+
+def _datetime_iso(value):
+    datetime_pattern = r'(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2})'
+    datetime_pattern_re = re.compile(datetime_pattern)
+    if not datetime_pattern_re.match(value):
+        raise argparse.ArgumentTypeError('%s is not a valid datetime format' % value)
+    return value
