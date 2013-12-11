@@ -120,6 +120,7 @@ class TestQueue(unittest.TestCase):
 
         mock_find_all_callid_between_date.assert_called_once_with(dao_sess, start, end)
         mock_remove_callids.assert_called_once_with(dao_sess, callids)
+        mock_stat_queue_periodic_remove_after.assert_called_once_with(dao_sess, start)
 
     @patch('xivo_dao.stat_call_on_queue_dao.remove_callids')
     @patch('xivo_dao.stat_call_on_queue_dao.find_all_callid_between_date')
@@ -138,3 +139,4 @@ class TestQueue(unittest.TestCase):
 
         mock_find_all_callid_between_date.assert_called_once_with(dao_sess, start, end)
         self.assertEqual(mock_remove_callids.call_count, 0)
+        mock_stat_queue_periodic_remove_after.assert_called_once_with(dao_sess, start)
