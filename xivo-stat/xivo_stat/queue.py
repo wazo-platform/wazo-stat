@@ -71,7 +71,9 @@ def insert_periodic_stat(dao_sess, start, end):
     dao_sess.commit()
 
 
-def remove_after_start(dao_sess, date):
-    logger.info('Removing queue cache after %s', date)
-    stat_call_on_queue_dao.remove_after(dao_sess, date)
-    stat_queue_periodic_dao.remove_after(dao_sess, date)
+def remove_between(dao_sess, start, end):
+    logger.info('Removing queue cache between %s - %s', start, end)
+    callids = stat_call_on_queue_dao.find_all_callid_between_date(dao_sess, start, end)
+    if callids:
+        stat_call_on_queue_dao.remove_callids(dao_sess, callids)
+    stat_queue_periodic_dao.remove_after(dao_sess, start)
