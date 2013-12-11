@@ -125,9 +125,9 @@ class TestQueue(unittest.TestCase):
     @patch('xivo_dao.stat_call_on_queue_dao.find_all_callid_between_date')
     @patch('xivo_dao.stat_queue_periodic_dao.remove_after')
     def test_remove_between_no_calls(self,
-                            mock_stat_queue_periodic_remove_after,
-                            mock_find_all_callid_between_date,
-                            mock_remove_callids):
+                                     mock_stat_queue_periodic_remove_after,
+                                     mock_find_all_callid_between_date,
+                                     mock_remove_callids):
         start = datetime.datetime(2012, 1, 1)
         end = datetime.datetime(2012, 1, 1, 23, 59, 59)
         callids = []
