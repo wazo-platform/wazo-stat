@@ -1,0 +1,23 @@
+xivo-stat (12.19~20120920.154356.b06a959-2) squeeze-xivo-skaro-dev; urgency=low
+
+  * Replaced cron job (6:00 and 12:00), now runs xivo-stat every six hours
+
+ -- Cedric Abunar <cabunar@avencall.com>  Tue, 25 Sep 2012 11:22:23 -0400
+
+xivo-stat (12.18~20120822.161650.176d822-4) squeeze-xivo-skaro-dev; urgency=low
+
+  * Replaced cron.daily with a cron.d that runs xivo-stat twice per day (6:00 and 12:00)
+
+ -- Gregory Eric Sanderson <gsanderson@avencall.com>  Fri, 14 Sep 2012 14:28:46 -0400
+
+xivo-stat (1.2.12~20120710.151804.5226a69-2) squeeze-xivo-skaro-dev; urgency=low
+
+  * Add daily cron tab
+
+ -- Pascal Cadotte Michaud <pcadottemichaud@avencall.com>  Wed, 11 Jul 2012 12:11:26 -0400
+
+xivo-stat (1.2.11~20120709.181355.e18e9fe-1) squeeze-xivo-skaro-dev; urgency=low
+
+  * Initial Release.
+
+ -- Nicolas HICHER (atarakt) <nhicher@proformatique.com>  Mon, 09 Jul 2012 14:25:41 -0400
