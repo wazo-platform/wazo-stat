@@ -23,9 +23,9 @@ from datetime import datetime as dt
 from datetime import timedelta
 
 from xivo_stat import agent
-from xivo_dao.helpers.db_manager import AsteriskSession
+from xivo_dao.helpers.db_manager import DaoSession
 
-dao_sess = AsteriskSession()
+dao_sess = DaoSession()
 
 ONE_HOUR = timedelta(hours=1)
 

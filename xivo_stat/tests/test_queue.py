@@ -21,9 +21,9 @@ import unittest
 from mock import patch
 
 from xivo_stat import queue
-from xivo_dao.helpers.db_manager import AsteriskSession
+from xivo_dao.helpers.db_manager import DaoSession
 
-dao_sess = AsteriskSession()
+dao_sess = DaoSession()
 
 
 class TestQueue(unittest.TestCase):
