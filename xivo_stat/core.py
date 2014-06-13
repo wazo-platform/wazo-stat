@@ -61,7 +61,7 @@ def get_start_time():
 
 def _clean_up_after_error():
     logger.info('Inconsistent cache, cleaning up...')
-    clean_db()
+    dao_sess.rollback()
     sys.exit(1)
 
 
@@ -82,13 +82,12 @@ def update_db(end_date, start_date=None):
         dao_sess.begin()
         insert_missing_queues(start, end)
         insert_missing_agents()
-        dao_sess.commit()
+        dao_sess.flush()
 
-        dao_sess.begin()
         queue.remove_between(dao_sess, start, end)
         agent.remove_after_start(dao_sess, start)
         queue.fill_simple_calls(dao_sess, start, end)
-        dao_sess.commit()
+        dao_sess.flush()
 
         agent.insert_periodic_stat(dao_sess, start, end)
 
@@ -96,16 +95,20 @@ def update_db(end_date, start_date=None):
             period_end = period_start + datetime.timedelta(hours=1) - datetime.timedelta(microseconds=1)
             queue.fill_calls(dao_sess, period_start, period_end)
             queue.insert_periodic_stat(dao_sess, period_start, period_end)
+
+        dao_sess.commit()
     except (IntegrityError, KeyboardInterrupt):
         _clean_up_after_error()
 
 
 def clean_db():
+    dao_sess.begin()
     stat_call_on_queue_dao.clean_table(dao_sess)
     stat_agent_periodic_dao.clean_table(dao_sess)
     stat_queue_periodic_dao.clean_table(dao_sess)
     stat_agent_dao.clean_table(dao_sess)
     stat_queue_dao.clean_table(dao_sess)
+    dao_sess.commit()
 
 
 def insert_missing_agents():

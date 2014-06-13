@@ -60,15 +60,13 @@ def fill_simple_calls(dao_sess, start, end):
 
 
 def insert_periodic_stat(dao_sess, start, end):
-    dao_sess.begin()
     periodic_stats = stat_call_on_queue_dao.get_periodic_stats_hour(dao_sess, start, end)
-    dao_sess.commit()
+    dao_sess.flush()
 
-    dao_sess.begin()
     for period, stats in periodic_stats.iteritems():
         logger.info('Inserting queue periodic stat %s', period)
         stat_queue_periodic_dao.insert_stats(dao_sess, stats, period)
-    dao_sess.commit()
+    dao_sess.flush()
 
 
 def remove_between(dao_sess, start, end):
