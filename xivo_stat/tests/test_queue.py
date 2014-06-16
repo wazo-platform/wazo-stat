@@ -80,6 +80,19 @@ class TestQueue(unittest.TestCase):
         mock_fill_abandoned_call.assert_called_once_with(dao_sess, start, end)
         mock_fill_timeout_call.assert_called_once_with(dao_sess, start, end)
 
+    @patch('xivo_dao.stat_dao.fill_simple_calls')
+    @patch('xivo_dao.stat_dao.fill_answered_calls')
+    @patch('xivo_dao.stat_dao.fill_leaveempty_calls')
+    def test_fill_simple_calls(self, fill_simple, fill_answered, fill_leaveempty):
+        start = datetime.datetime(2012, 1, 1)
+        end = datetime.datetime(2012, 1, 1, 4, 59, 59, 999999)
+
+        queue.fill_simple_calls(dao_sess, start, end)
+
+        fill_simple.assert_called_once_with(dao_sess, start, end)
+        fill_answered.assert_called_once_with(dao_sess, start, end)
+        fill_leaveempty.assert_called_once_with(dao_sess, start, end)
+
     @patch('xivo_dao.stat_call_on_queue_dao.get_periodic_stats_hour')
     @patch('xivo_dao.stat_queue_periodic_dao.insert_stats')
     def test_insert_periodic_stat(self, mock_insert_stats, mock_get_periodic_stats):
