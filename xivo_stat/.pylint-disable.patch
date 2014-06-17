@@ -1,0 +1,12 @@
+diff --unified --recursive '--exclude=.pylint-disable.patch' original/core.py patched/core.py
+--- original/core.py
++++ patched/core.py
+@@ -96,7 +96,7 @@
+             queue.insert_periodic_stat(dao_sess, period_start, period_end)
+ 
+         dao_sess.commit()
+-    except:
++    except: # pylint: disable=bare-except
+         logger.exception("error while updating database")
+         _clean_up_after_error()
+ 
