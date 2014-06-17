@@ -27,7 +27,6 @@ from xivo_dao import stat_call_on_queue_dao
 from xivo_dao import queue_log_dao
 from xivo_dao import stat_queue_dao
 from xivo_dao import stat_agent_dao
-from sqlalchemy.exc import IntegrityError
 from xivo_dao.helpers.db_manager import DaoSession
 
 logger = logging.getLogger(__name__)
@@ -97,7 +96,8 @@ def update_db(end_date, start_date=None):
             queue.insert_periodic_stat(dao_sess, period_start, period_end)
 
         dao_sess.commit()
-    except (IntegrityError, KeyboardInterrupt):
+    except:
+        logger.exception("error while updating database")
         _clean_up_after_error()
 
 
