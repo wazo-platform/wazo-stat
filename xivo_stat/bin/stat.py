@@ -23,6 +23,7 @@ import sys
 from datetime import datetime
 
 from xivo import argparse_cmd, pid_file
+from xivo.xivo_logging import setup_logging
 from xivo_stat import core
 
 PIDFILENAME = '/var/run/xivo-stat.pid'
@@ -42,19 +43,8 @@ def main():
 class _XivoStatCommand(argparse_cmd.AbstractCommand):
 
     def pre_execute(self, _):
-        self._init_logging()
-
-    def _init_logging(self):
-        root_logger = logging.getLogger()
-        root_logger.setLevel(logging.INFO)
-
-        formatter = logging.Formatter('%(asctime)s: %(message)s')
-        out_handler = logging.StreamHandler(sys.stdout)
-        file_handler = logging.FileHandler(LOGFILENAME, encoding='utf8')
-
-        for handler in (out_handler, file_handler):
-            handler.setFormatter(formatter)
-            root_logger.addHandler(handler)
+        log_format = '%(asctime)s: %(message)s'
+        setup_logging(LOGFILENAME, foreground=True, debug=False, log_format=log_format)
 
     def configure_subcommands(self, subcommands):
         subcommands.add_subcommand(_FillDbSubcommand('fill_db'))
