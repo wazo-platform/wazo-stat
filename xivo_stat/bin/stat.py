@@ -21,7 +21,8 @@ import sys
 
 from datetime import datetime
 
-from xivo import argparse_cmd, pid_file
+from xivo import argparse_cmd
+from xivo.daemonize import pidfile_context
 from xivo.xivo_logging import setup_logging
 from xivo_stat import core
 
@@ -30,12 +31,8 @@ LOGFILENAME = '/var/log/xivo-stat.log'
 
 
 def main():
-    if pid_file.is_already_running(PIDFILENAME):
-        print 'XiVO stat is already running'
-        sys.exit(1)
-
     command = _XivoStatCommand()
-    with pid_file.pidfile(PIDFILENAME):
+    with pidfile_context(PIDFILENAME, foreground=True):
         argparse_cmd.execute_command(command)
 
 
