@@ -30,16 +30,15 @@ LOGFILENAME = '/var/log/xivo-stat.log'
 
 
 def main():
+    log_format = '%(asctime)s: %(message)s'
+    setup_logging(LOGFILENAME, foreground=True, debug=False, log_format=log_format)
+
     command = _XivoStatCommand()
     with pidfile_context(PIDFILENAME, foreground=True):
         argparse_cmd.execute_command(command)
 
 
 class _XivoStatCommand(argparse_cmd.AbstractCommand):
-
-    def pre_execute(self, _):
-        log_format = '%(asctime)s: %(message)s'
-        setup_logging(LOGFILENAME, foreground=True, debug=False, log_format=log_format)
 
     def configure_subcommands(self, subcommands):
         subcommands.add_subcommand(_FillDbSubcommand('fill_db'))
