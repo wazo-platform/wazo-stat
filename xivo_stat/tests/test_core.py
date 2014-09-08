@@ -20,12 +20,18 @@ import datetime
 from mock import patch
 from xivo_stat import core
 from xivo_stat.core import _ERASE_TIME_WHEN_STARTING
-from xivo_dao.helpers.db_manager import DaoSession
+from xivo_dao.helpers.db_manager import daosession
 
-dao_sess = DaoSession()
+
+@daosession
+def _session(session):
+    return session
 
 
 class TestCore(unittest.TestCase):
+
+    def setUp(self):
+        self._dao_sess = _session()
 
     def test_hour_start(self):
         t = datetime.datetime(2012, 1, 1, 1, 23, 37)
@@ -87,11 +93,11 @@ class TestCore(unittest.TestCase):
                       mock_clean_table_stat_agent_dao):
         core.clean_db()
 
-        mock_clean_table_stat_agent_dao.assert_called_once_with(dao_sess)
-        mock_clean_table_stat_agent_periodic.assert_called_once_with(dao_sess)
-        mock_clean_table_stat_call_on_queue.assert_called_once_with(dao_sess)
-        mock_clean_table_queue_dao.assert_called_once_with(dao_sess)
-        mock_clean_table_stat_queue_periodic.assert_called_once_with(dao_sess)
+        mock_clean_table_stat_agent_dao.assert_called_once_with(self._dao_sess)
+        mock_clean_table_stat_agent_periodic.assert_called_once_with(self._dao_sess)
+        mock_clean_table_stat_call_on_queue.assert_called_once_with(self._dao_sess)
+        mock_clean_table_queue_dao.assert_called_once_with(self._dao_sess)
+        mock_clean_table_stat_queue_periodic.assert_called_once_with(self._dao_sess)
 
     @patch('xivo_dao.queue_log_dao.get_queue_names_in_range')
     @patch('xivo_dao.stat_queue_dao.insert_if_missing')
@@ -103,10 +109,10 @@ class TestCore(unittest.TestCase):
 
         core.insert_missing_queues(start, end)
 
-        mock_insert_if_missing.assert_called_once_with(dao_sess, queue_names)
+        mock_insert_if_missing.assert_called_once_with(self._dao_sess, queue_names)
 
     @patch('xivo_dao.stat_agent_dao.insert_missing_agents')
     def test_insert_missing_agents(self, mock_insert_agent_if_missing):
         core.insert_missing_agents()
 
-        mock_insert_agent_if_missing.assert_called_once_with(dao_sess)
+        mock_insert_agent_if_missing.assert_called_once_with(self._dao_sess)

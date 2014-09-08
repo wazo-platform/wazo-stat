@@ -21,15 +21,19 @@ import unittest
 from mock import patch
 
 from xivo_stat import queue
-from xivo_dao.helpers.db_manager import DaoSession
+from xivo_dao.helpers.db_manager import daosession
 
-dao_sess = DaoSession()
+
+@daosession
+def _session(session):
+    return session
 
 
 class TestQueue(unittest.TestCase):
 
     def setUp(self):
         self._queue_name = 'my_queue'
+        self._dao_sess = _session()
 
     @patch('xivo_dao.queue_log_dao.get_queue_abandoned_call')
     @patch('xivo_dao.stat_call_on_queue_dao.add_abandoned_call')
@@ -46,9 +50,10 @@ class TestQueue(unittest.TestCase):
                                                  'callid': callid,
                                                  'waittime': waittime}]
 
-        queue.fill_abandoned_call(dao_sess, d1, d2)
+        queue.fill_abandoned_call(self._dao_sess, d1, d2)
 
-        mock_add_abandoned_call.assert_called_once_with(dao_sess, callid, d1, self._queue_name, waittime)
+        mock_add_abandoned_call.assert_called_once_with(
+            self._dao_sess, callid, d1, self._queue_name, waittime)
 
     @patch('xivo_dao.queue_log_dao.get_queue_timeout_call')
     @patch('xivo_dao.stat_call_on_queue_dao.add_timeout_call')
@@ -65,9 +70,9 @@ class TestQueue(unittest.TestCase):
                                                'callid': callid,
                                                'waittime': waittime}]
 
-        queue.fill_timeout_call(dao_sess, d1, d2)
+        queue.fill_timeout_call(self._dao_sess, d1, d2)
 
-        mock_add_timeout_call.assert_called_once_with(dao_sess, callid, d1, self._queue_name, waittime)
+        mock_add_timeout_call.assert_called_once_with(self._dao_sess, callid, d1, self._queue_name, waittime)
 
     @patch('xivo_stat.queue.fill_abandoned_call')
     @patch('xivo_stat.queue.fill_timeout_call')
@@ -75,10 +80,10 @@ class TestQueue(unittest.TestCase):
         start = datetime.datetime(2012, 1, 1)
         end = datetime.datetime(2012, 1, 1, 4, 59, 59, 999999)
 
-        queue.fill_calls(dao_sess, start, end)
+        queue.fill_calls(self._dao_sess, start, end)
 
-        mock_fill_abandoned_call.assert_called_once_with(dao_sess, start, end)
-        mock_fill_timeout_call.assert_called_once_with(dao_sess, start, end)
+        mock_fill_abandoned_call.assert_called_once_with(self._dao_sess, start, end)
+        mock_fill_timeout_call.assert_called_once_with(self._dao_sess, start, end)
 
     @patch('xivo_dao.stat_dao.fill_simple_calls')
     @patch('xivo_dao.stat_dao.fill_answered_calls')
@@ -87,11 +92,11 @@ class TestQueue(unittest.TestCase):
         start = datetime.datetime(2012, 1, 1)
         end = datetime.datetime(2012, 1, 1, 4, 59, 59, 999999)
 
-        queue.fill_simple_calls(dao_sess, start, end)
+        queue.fill_simple_calls(self._dao_sess, start, end)
 
-        fill_simple.assert_called_once_with(dao_sess, start, end)
-        fill_answered.assert_called_once_with(dao_sess, start, end)
-        fill_leaveempty.assert_called_once_with(dao_sess, start, end)
+        fill_simple.assert_called_once_with(self._dao_sess, start, end)
+        fill_answered.assert_called_once_with(self._dao_sess, start, end)
+        fill_leaveempty.assert_called_once_with(self._dao_sess, start, end)
 
     @patch('xivo_dao.stat_call_on_queue_dao.get_periodic_stats_hour')
     @patch('xivo_dao.stat_queue_periodic_dao.insert_stats')
@@ -110,10 +115,10 @@ class TestQueue(unittest.TestCase):
 
         mock_get_periodic_stats.return_value = fake_stats
 
-        queue.insert_periodic_stat(dao_sess, s, e)
+        queue.insert_periodic_stat(self._dao_sess, s, e)
 
-        mock_insert_stats.assert_any_call(dao_sess, stat1, t1)
-        mock_insert_stats.assert_any_call(dao_sess, stat2, t2)
+        mock_insert_stats.assert_any_call(self._dao_sess, stat1, t1)
+        mock_insert_stats.assert_any_call(self._dao_sess, stat2, t2)
         self.assertEqual(mock_insert_stats.call_count, 2)
 
     @patch('xivo_dao.stat_call_on_queue_dao.remove_callids')
@@ -129,11 +134,11 @@ class TestQueue(unittest.TestCase):
 
         mock_find_all_callid_between_date.return_value = callids
 
-        queue.remove_between(dao_sess, start, end)
+        queue.remove_between(self._dao_sess, start, end)
 
-        mock_find_all_callid_between_date.assert_called_once_with(dao_sess, start, end)
-        mock_remove_callids.assert_called_once_with(dao_sess, callids)
-        mock_stat_queue_periodic_remove_after.assert_called_once_with(dao_sess, start)
+        mock_find_all_callid_between_date.assert_called_once_with(self._dao_sess, start, end)
+        mock_remove_callids.assert_called_once_with(self._dao_sess, callids)
+        mock_stat_queue_periodic_remove_after.assert_called_once_with(self._dao_sess, start)
 
     @patch('xivo_dao.stat_call_on_queue_dao.remove_callids')
     @patch('xivo_dao.stat_call_on_queue_dao.find_all_callid_between_date')
@@ -148,8 +153,8 @@ class TestQueue(unittest.TestCase):
 
         mock_find_all_callid_between_date.return_value = callids
 
-        queue.remove_between(dao_sess, start, end)
+        queue.remove_between(self._dao_sess, start, end)
 
-        mock_find_all_callid_between_date.assert_called_once_with(dao_sess, start, end)
+        mock_find_all_callid_between_date.assert_called_once_with(self._dao_sess, start, end)
         self.assertEqual(mock_remove_callids.call_count, 0)
-        mock_stat_queue_periodic_remove_after.assert_called_once_with(dao_sess, start)
+        mock_stat_queue_periodic_remove_after.assert_called_once_with(self._dao_sess, start)

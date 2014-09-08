@@ -27,13 +27,19 @@ from xivo_dao import stat_call_on_queue_dao
 from xivo_dao import queue_log_dao
 from xivo_dao import stat_queue_dao
 from xivo_dao import stat_agent_dao
-from xivo_dao.helpers.db_manager import DaoSession
+from xivo_dao.helpers.db_manager import daosession
 
 logger = logging.getLogger(__name__)
 
 _ERASE_TIME_WHEN_STARTING = datetime.timedelta(hours=8)
 DELTA_1HOUR = datetime.timedelta(hours=1)
-dao_sess = DaoSession()
+
+
+@daosession
+def _session(session):
+    return session
+
+dao_sess = _session()
 
 
 def hour_start(t):
