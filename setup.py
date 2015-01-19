@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
 
-from distutils.core import setup
+from setuptools import setup
+from setuptools import find_packages
 
 setup(
     name='xivo-stat',
@@ -11,7 +12,6 @@ setup(
     author_email='dev@avencall.com',
     url='http://git.xivo.io/',
     license='GPLv3',
-    packages=['xivo_stat',
-              'xivo_stat.bin'],
+    packages=find_packages(),
     scripts=['bin/xivo-stat'],
 )
