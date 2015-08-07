@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2013-2014 Avencall
+# Copyright (C) 2013-2015 Avencall
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -35,6 +35,7 @@ def _session(session):
 
 class TestAgent(unittest.TestCase):
 
+    @unittest.skip
     @patch('xivo_dao.stat_agent_periodic_dao.insert_stats')
     @patch('xivo_dao.stat_dao.get_login_intervals_in_range')
     @patch('xivo_dao.stat_dao.get_pause_intervals_in_range')
