@@ -17,7 +17,9 @@
 
 import unittest
 
-from mock import Mock, patch
+from mock import ANY
+from mock import Mock
+from mock import patch
 
 from datetime import datetime as dt
 from datetime import timedelta
@@ -35,7 +37,6 @@ def _session(session):
 
 class TestAgent(unittest.TestCase):
 
-    @unittest.skip
     @patch('xivo_dao.stat_agent_periodic_dao.insert_stats')
     @patch('xivo_dao.stat_dao.get_login_intervals_in_range')
     @patch('xivo_dao.stat_dao.get_pause_intervals_in_range')
@@ -47,7 +48,7 @@ class TestAgent(unittest.TestCase):
                                   mock_insert_stats):
         agent_id_1 = 12
         agent_id_2 = 13
-        input_stats = {
+        login = {
             agent_id_1: [
                 (dt(2012, 1, 1, 1, 5), dt(2012, 1, 1, 1, 15)),
                 (dt(2012, 1, 1, 1, 20), dt(2012, 1, 1, 2, 20)),
@@ -56,26 +57,31 @@ class TestAgent(unittest.TestCase):
                 (dt(2012, 1, 1, 1), dt(2012, 1, 1, 5)),
             ]
         }
+        pause = {
+            agent_id_1: [
+                (dt(2012, 1, 1, 1, 35), dt(2012, 1, 1, 1, 40)),
+            ],
+            agent_id_2: [
+                (dt(2012, 1, 1, 2), dt(2012, 1, 1, 3)),
+            ]
+        }
         output_stats = {
             dt(2012, 1, 1, 1): {
                 agent_id_1: {'login_time': timedelta(minutes=50),
-                             'pause_time': timedelta(minutes=13)},
-                agent_id_2: {'login_time': ONE_HOUR,
-                             'pause_time': timedelta(minutes=13)},
+                             'pause_time': timedelta(minutes=5)},
+                agent_id_2: {'login_time': ONE_HOUR},
             },
             dt(2012, 1, 1, 2): {
-                agent_id_1: {'login_time': timedelta(minutes=20),
-                             'pause_time': timedelta(minutes=33)},
+                agent_id_1: {'login_time': timedelta(minutes=20)},
                 agent_id_2: {'login_time': ONE_HOUR,
-                             'pause_time': timedelta(minutes=13)},
+                             'pause_time': ONE_HOUR},
             },
             dt(2012, 1, 1, 3): {
-                agent_id_2: {'login_time': ONE_HOUR,
-                             'pause_time': ONE_HOUR},
+                agent_id_1: {'wrapup_time': timedelta(seconds=15)},
+                agent_id_2: {'login_time': ONE_HOUR},
             },
             dt(2012, 1, 1, 4): {
-                agent_id_2: {'login_time': ONE_HOUR,
-                             'pause_time': ONE_HOUR},
+                agent_id_2: {'login_time': ONE_HOUR},
             }
         }
         wrapups = {
@@ -86,8 +92,8 @@ class TestAgent(unittest.TestCase):
         start = dt(2012, 1, 1, 1)
         end = dt(2012, 1, 1, 4)
 
-        mock_get_login_intervals_in_range.return_value = input_stats
-        mock_get_pause_intervals_in_range.return_value = input_stats
+        mock_get_login_intervals_in_range.return_value = login
+        mock_get_pause_intervals_in_range.return_value = pause
         mock_get_wrapup_times.return_value = wrapups
         time_computer = Mock(agent.AgentTimeComputer)
         time_computer.compute_login_time_in_period.return_value = output_stats
@@ -96,8 +102,7 @@ class TestAgent(unittest.TestCase):
         agent.insert_periodic_stat(_session(), start, end)
 
         for period_start, agents_stats in output_stats.iteritems():
-            mock_insert_stats.assert_any_calls(
-                agents_stats, period_start)
+            mock_insert_stats.assert_any_call(ANY, agents_stats, period_start)
 
 
 class TestAgentLoginTimeComputer(unittest.TestCase):
