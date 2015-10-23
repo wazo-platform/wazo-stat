@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2013-2014 Avencall
+# Copyright (C) 2013-2015 Avencall
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -17,21 +17,12 @@
 
 import unittest
 import datetime
-from mock import patch
+from mock import ANY, patch, sentinel
 from xivo_stat import core
 from xivo_stat.core import _ERASE_TIME_WHEN_STARTING
-from xivo_dao.helpers.db_manager import daosession
-
-
-@daosession
-def _session(session):
-    return session
 
 
 class TestCore(unittest.TestCase):
-
-    def setUp(self):
-        self._dao_sess = _session()
 
     def test_hour_start(self):
         t = datetime.datetime(2012, 1, 1, 1, 23, 37)
@@ -57,7 +48,7 @@ class TestCore(unittest.TestCase):
 
         expected = datetime.datetime(2012, 1, 1, 1, 0, 0) - _ERASE_TIME_WHEN_STARTING
 
-        result = core.get_start_time()
+        result = core.get_start_time(sentinel.dao_sess)
 
         self.assertEqual(result, expected)
 
@@ -69,7 +60,7 @@ class TestCore(unittest.TestCase):
 
         expected = datetime.datetime(2012, 1, 1, 1, 0, 0) - _ERASE_TIME_WHEN_STARTING
 
-        result = core.get_start_time()
+        result = core.get_start_time(sentinel.dao_sess)
 
         self.assertEqual(result, expected)
 
@@ -79,7 +70,7 @@ class TestCore(unittest.TestCase):
         mock_get_most_recent_time.side_effect = LookupError('Empty table')
         mock_get_first_time.side_effect = LookupError('Empty table')
 
-        self.assertRaises(RuntimeError, core.get_start_time)
+        self.assertRaises(RuntimeError, core.get_start_time, sentinel.dao_sess)
 
     @patch('xivo_dao.stat_agent_dao.clean_table')
     @patch('xivo_dao.stat_agent_periodic_dao.clean_table')
@@ -93,11 +84,11 @@ class TestCore(unittest.TestCase):
                       mock_clean_table_stat_agent_dao):
         core.clean_db()
 
-        mock_clean_table_stat_agent_dao.assert_called_once_with(self._dao_sess)
-        mock_clean_table_stat_agent_periodic.assert_called_once_with(self._dao_sess)
-        mock_clean_table_stat_call_on_queue.assert_called_once_with(self._dao_sess)
-        mock_clean_table_queue_dao.assert_called_once_with(self._dao_sess)
-        mock_clean_table_stat_queue_periodic.assert_called_once_with(self._dao_sess)
+        mock_clean_table_stat_agent_dao.assert_called_once_with(ANY)
+        mock_clean_table_stat_agent_periodic.assert_called_once_with(ANY)
+        mock_clean_table_stat_call_on_queue.assert_called_once_with(ANY)
+        mock_clean_table_queue_dao.assert_called_once_with(ANY)
+        mock_clean_table_stat_queue_periodic.assert_called_once_with(ANY)
 
     @patch('xivo_dao.queue_log_dao.get_queue_names_in_range')
     @patch('xivo_dao.stat_queue_dao.insert_if_missing')
@@ -107,12 +98,12 @@ class TestCore(unittest.TestCase):
         queue_names = ['queue_%s' % x for x in range(10)]
         mock_get_queue_names_in_range.return_value = queue_names
 
-        core.insert_missing_queues(start, end)
+        core.insert_missing_queues(sentinel.dao_sess, start, end)
 
-        mock_insert_if_missing.assert_called_once_with(self._dao_sess, queue_names)
+        mock_insert_if_missing.assert_called_once_with(sentinel.dao_sess, queue_names)
 
     @patch('xivo_dao.stat_agent_dao.insert_missing_agents')
     def test_insert_missing_agents(self, mock_insert_agent_if_missing):
-        core.insert_missing_agents()
+        core.insert_missing_agents(sentinel.dao_sess)
 
-        mock_insert_agent_if_missing.assert_called_once_with(self._dao_sess)
+        mock_insert_agent_if_missing.assert_called_once_with(sentinel.dao_sess)
