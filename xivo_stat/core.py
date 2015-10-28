@@ -17,7 +17,6 @@
 
 import logging
 import datetime
-import sys
 
 from xivo_stat import queue
 from xivo_stat import agent
