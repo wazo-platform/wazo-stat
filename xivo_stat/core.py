@@ -71,26 +71,22 @@ def update_db(end_date, start_date=None):
 
     logger.info('Filling cache into DB')
     logger.info('Start Time: %s, End time: %s', start, end)
-    try:
-        with session_scope() as dao_sess:
-            insert_missing_queues(dao_sess, start, end)
-            insert_missing_agents(dao_sess)
-            dao_sess.flush()
+    with session_scope() as dao_sess:
+        insert_missing_queues(dao_sess, start, end)
+        insert_missing_agents(dao_sess)
+        dao_sess.flush()
 
-            queue.remove_between(dao_sess, start, end)
-            agent.remove_after_start(dao_sess, start)
-            queue.fill_simple_calls(dao_sess, start, end)
-            dao_sess.flush()
+        queue.remove_between(dao_sess, start, end)
+        agent.remove_after_start(dao_sess, start)
+        queue.fill_simple_calls(dao_sess, start, end)
+        dao_sess.flush()
 
-            agent.insert_periodic_stat(dao_sess, start, end)
+        agent.insert_periodic_stat(dao_sess, start, end)
 
-            for period_start in queue_log_dao.hours_with_calls(dao_sess, start, end):
-                period_end = period_start + datetime.timedelta(hours=1) - datetime.timedelta(microseconds=1)
-                queue.fill_calls(dao_sess, period_start, period_end)
-                queue.insert_periodic_stat(dao_sess, period_start, period_end)
-    except:
-        logger.exception("error while updating database")
-        sys.exit(1)
+        for period_start in queue_log_dao.hours_with_calls(dao_sess, start, end):
+            period_end = period_start + datetime.timedelta(hours=1) - datetime.timedelta(microseconds=1)
+            queue.fill_calls(dao_sess, period_start, period_end)
+            queue.insert_periodic_stat(dao_sess, period_start, period_end)
 
 
 def clean_db():
