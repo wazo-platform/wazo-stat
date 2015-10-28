@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2012-2014 Avencall
+# Copyright (C) 2012-2015 Avencall
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -23,6 +23,7 @@ from datetime import datetime
 from xivo import argparse_cmd
 from xivo.daemonize import pidfile_context
 from xivo.xivo_logging import setup_logging
+from xivo_dao import init_db_from_config, default_config
 from xivo_stat import core
 
 PIDFILENAME = '/var/run/xivo-stat.pid'
@@ -31,6 +32,7 @@ LOGFILENAME = '/var/log/xivo-stat.log'
 
 def main():
     log_format = '%(asctime)s: %(message)s'
+    init_db_from_config(default_config())
     setup_logging(LOGFILENAME, foreground=True, debug=False, log_format=log_format)
 
     command = _XivoStatCommand()

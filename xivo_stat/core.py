@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2013-2014 Avencall
+# Copyright (C) 2013-2015 Avencall
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -27,19 +27,12 @@ from xivo_dao import stat_call_on_queue_dao
 from xivo_dao import queue_log_dao
 from xivo_dao import stat_queue_dao
 from xivo_dao import stat_agent_dao
-from xivo_dao.helpers.db_manager import daosession
+from xivo_dao.helpers.db_utils import session_scope
 
 logger = logging.getLogger(__name__)
 
 _ERASE_TIME_WHEN_STARTING = datetime.timedelta(hours=8)
 DELTA_1HOUR = datetime.timedelta(hours=1)
-
-
-@daosession
-def _session(session):
-    return session
-
-dao_sess = _session()
 
 
 def hour_start(t):
@@ -53,7 +46,7 @@ def end_of_previous_hour(t):
     return hour_start(t) - datetime.timedelta(microseconds=1)
 
 
-def get_start_time():
+def get_start_time(dao_sess):
     try:
         start = hour_start(stat_queue_periodic_dao.get_most_recent_time(dao_sess))
     except LookupError:
@@ -64,16 +57,11 @@ def get_start_time():
     return start - _ERASE_TIME_WHEN_STARTING
 
 
-def _clean_up_after_error():
-    logger.info('Inconsistent cache, cleaning up...')
-    dao_sess.rollback()
-    sys.exit(1)
-
-
 def update_db(end_date, start_date=None):
     if start_date is None:
         try:
-            start = get_start_time()
+            with session_scope() as dao_sess:
+                start = get_start_time(dao_sess)
         except RuntimeError:
             return
     else:
@@ -84,45 +72,42 @@ def update_db(end_date, start_date=None):
     logger.info('Filling cache into DB')
     logger.info('Start Time: %s, End time: %s', start, end)
     try:
-        dao_sess.begin()
-        insert_missing_queues(start, end)
-        insert_missing_agents()
-        dao_sess.flush()
+        with session_scope() as dao_sess:
+            insert_missing_queues(dao_sess, start, end)
+            insert_missing_agents(dao_sess)
+            dao_sess.flush()
 
-        queue.remove_between(dao_sess, start, end)
-        agent.remove_after_start(dao_sess, start)
-        queue.fill_simple_calls(dao_sess, start, end)
-        dao_sess.flush()
+            queue.remove_between(dao_sess, start, end)
+            agent.remove_after_start(dao_sess, start)
+            queue.fill_simple_calls(dao_sess, start, end)
+            dao_sess.flush()
 
-        agent.insert_periodic_stat(dao_sess, start, end)
+            agent.insert_periodic_stat(dao_sess, start, end)
 
-        for period_start in queue_log_dao.hours_with_calls(dao_sess, start, end):
-            period_end = period_start + datetime.timedelta(hours=1) - datetime.timedelta(microseconds=1)
-            queue.fill_calls(dao_sess, period_start, period_end)
-            queue.insert_periodic_stat(dao_sess, period_start, period_end)
-
-        dao_sess.commit()
+            for period_start in queue_log_dao.hours_with_calls(dao_sess, start, end):
+                period_end = period_start + datetime.timedelta(hours=1) - datetime.timedelta(microseconds=1)
+                queue.fill_calls(dao_sess, period_start, period_end)
+                queue.insert_periodic_stat(dao_sess, period_start, period_end)
     except:
         logger.exception("error while updating database")
-        _clean_up_after_error()
+        sys.exit(1)
 
 
 def clean_db():
-    dao_sess.begin()
-    stat_call_on_queue_dao.clean_table(dao_sess)
-    stat_agent_periodic_dao.clean_table(dao_sess)
-    stat_queue_periodic_dao.clean_table(dao_sess)
-    stat_agent_dao.clean_table(dao_sess)
-    stat_queue_dao.clean_table(dao_sess)
-    dao_sess.commit()
+    with session_scope() as dao_sess:
+        stat_call_on_queue_dao.clean_table(dao_sess)
+        stat_agent_periodic_dao.clean_table(dao_sess)
+        stat_queue_periodic_dao.clean_table(dao_sess)
+        stat_agent_dao.clean_table(dao_sess)
+        stat_queue_dao.clean_table(dao_sess)
 
 
-def insert_missing_agents():
+def insert_missing_agents(dao_sess):
     logger.info('Inserting missing agents...')
     stat_agent_dao.insert_missing_agents(dao_sess)
 
 
-def insert_missing_queues(start, end):
+def insert_missing_queues(dao_sess, start, end):
     logger.info('Inserting missing queues...')
     queue_names = queue_log_dao.get_queue_names_in_range(dao_sess, start, end)
     stat_queue_dao.insert_if_missing(dao_sess, queue_names)
