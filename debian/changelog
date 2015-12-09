@@ -1,4 +1,4 @@
-xivo-stat (12.19~20120920.154356.b06a959-2) squeeze-xivo-skaro-dev; urgency=low
+xivo-stat (12.19~20120920.154356.b06a959) xivo-dev; urgency=low
 
   * Replaced cron job (6:00 and 12:00), now runs xivo-stat every six hours
 
