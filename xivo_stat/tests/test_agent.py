@@ -17,15 +17,15 @@
 
 import unittest
 
-from mock import ANY
-from mock import Mock
-from mock import patch
-
 from datetime import datetime as dt
 from datetime import timedelta
 
-from xivo_stat import agent
+from mock import ANY
+from mock import Mock
+from mock import patch
 from xivo_dao.helpers.db_manager import daosession
+
+from xivo_stat import agent
 
 ONE_HOUR = timedelta(hours=1)
 

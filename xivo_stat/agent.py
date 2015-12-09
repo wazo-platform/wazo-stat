@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2013-2014 Avencall
+# Copyright (C) 2013-2015 Avencall
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -18,9 +18,10 @@
 import logging
 from datetime import timedelta
 
-from xivo_stat import time_utils
 from xivo_dao import stat_dao, stat_agent_periodic_dao
 from xivo_dao import queue_log_dao
+
+from xivo_stat import time_utils
 
 logger = logging.getLogger(__name__)
 

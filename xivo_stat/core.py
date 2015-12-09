@@ -18,8 +18,6 @@
 import logging
 import datetime
 
-from xivo_stat import queue
-from xivo_stat import agent
 from xivo_dao import stat_queue_periodic_dao
 from xivo_dao import stat_agent_periodic_dao
 from xivo_dao import stat_call_on_queue_dao
@@ -27,6 +25,9 @@ from xivo_dao import queue_log_dao
 from xivo_dao import stat_queue_dao
 from xivo_dao import stat_agent_dao
 from xivo_dao.helpers.db_utils import session_scope
+
+from xivo_stat import queue
+from xivo_stat import agent
 
 logger = logging.getLogger(__name__)
 
