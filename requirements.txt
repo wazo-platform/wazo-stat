@@ -1,5 +1,5 @@
-git+https://github.com/xivo-pbx/xivo-lib-python.git
-git+https://github.com/xivo-pbx/xivo-dao.git
+git+https://github.com/wazo-pbx/xivo-lib-python.git
+git+https://github.com/wazo-pbx/xivo-dao.git
 sqlalchemy==0.9.8  # from xivo-dao
 psycopg2==2.5.4  # from xivo-dao
 pyyaml==3.11  # from xivo-lib-python
