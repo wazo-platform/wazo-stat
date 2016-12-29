@@ -2,7 +2,7 @@ xivo-stat
 =========
 [![Build Status](https://travis-ci.org/wazo-pbx/xivo-stat.png?branch=master)](https://travis-ci.org/wazo-pbx/xivo-stat)
 
-XiVO statistic generation utilities
+Wazo statistic generation utilities
 
 
 Running unit tests
