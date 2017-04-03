@@ -3,16 +3,8 @@
 #
 # see: dh_installdeb(1)
 
-OLD_CRON_FILE="/etc/cron.daily/xivo-stat"
-
 case "$1" in
-    configure)
-        if [ -f $OLD_CRON_FILE ]; then
-            rm $OLD_CRON_FILE
-        fi
-    ;;
-    abort-upgrade|abort-remove|abort-deconfigure)
-    
+    configure|abort-upgrade|abort-remove|abort-deconfigure)
     ;;
 
     *)
