@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright 2012-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2012-2020 The Wazo Authors  (see the AUTHORS file)
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -33,7 +33,7 @@ LOGFILENAME = '/var/log/xivo-stat.log'
 def main():
     log_format = '%(asctime)s: %(message)s'
     init_db_from_config(default_config())
-    setup_logging(LOGFILENAME, foreground=True, debug=False, log_format=log_format)
+    setup_logging(LOGFILENAME, debug=False, log_format=log_format)
 
     command = _XivoStatCommand()
     with pidfile_context(PIDFILENAME, foreground=True):
