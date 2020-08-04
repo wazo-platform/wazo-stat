@@ -36,7 +36,7 @@ def main():
     setup_logging(LOGFILENAME, debug=False, log_format=log_format)
 
     command = _XivoStatCommand()
-    with pidfile_context(PIDFILENAME, foreground=True):
+    with pidfile_context(PIDFILENAME):
         argparse_cmd.execute_command(command)
 
 
