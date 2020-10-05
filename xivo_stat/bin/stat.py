@@ -27,14 +27,13 @@ from xivo_dao import init_db_from_config
 from xivo_stat import core, config
 
 PIDFILENAME = '/run/xivo-stat.pid'
-LOGFILENAME = '/var/log/xivo-stat.log'
 
 
 def main():
     log_format = '%(asctime)s: %(message)s'
     main_config = config.get_config()
     init_db_from_config(main_config)
-    setup_logging(LOGFILENAME, debug=main_config['debug'], log_format=log_format)
+    setup_logging(main_config['log_filename'], debug=main_config['debug'], log_format=log_format)
 
     command = _XivoStatCommand()
     with pidfile_context(PIDFILENAME):
