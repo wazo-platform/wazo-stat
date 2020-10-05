@@ -11,3 +11,17 @@ debug: false
 
 # Database connection informations.
 db_uri: postgresql://asterisk:proformatique@localhost/asterisk?application_name=wazo-stat
+
+# Connection info to the authentication server
+auth:
+  host: localhost
+  port: 9497
+  prefix: null
+  https: false
+
+# Confd connection information
+confd:
+  host: localhost
+  port: 9486
+  prefix: null
+  https: false

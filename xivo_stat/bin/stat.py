@@ -35,21 +35,28 @@ def main():
     init_db_from_config(main_config)
     setup_logging(main_config['log_filename'], debug=main_config['debug'], log_format=log_format)
 
-    command = _XivoStatCommand()
+    command = _XivoStatCommand(main_config)
     with pidfile_context(PIDFILENAME):
         argparse_cmd.execute_command(command)
 
 
 class _XivoStatCommand(argparse_cmd.AbstractCommand):
 
+    def __init__(self, main_config):
+        self._config = main_config
+
     def configure_subcommands(self, subcommands):
-        subcommands.add_subcommand(_FillDbSubcommand('fill_db'))
+        subcommands.add_subcommand(_FillDbSubcommand('fill_db', self._config))
         subcommands.add_subcommand(_CleanDbSubcommand('clean_db'))
 
 
 class _FillDbSubcommand(argparse_cmd.AbstractSubcommand):
     _HELP_DATETIME_FORMAT = '%%Y-%%m-%%dT%%H:%%M:%%S'
     _DATETIME_FORMAT = '%Y-%m-%dT%H:%M:%S'
+
+    def __init__(self, name, main_config):
+        super(_FillDbSubcommand, self).__init__(name)
+        self._config = main_config
 
     def configure_parser(self, parser):
         parser.add_argument('--start',
@@ -61,7 +68,8 @@ class _FillDbSubcommand(argparse_cmd.AbstractSubcommand):
                             help='End date to generate the statistics using this format: %s' % self._HELP_DATETIME_FORMAT)
 
     def execute(self, parsed_args):
-        core.update_db(start_date=parsed_args.start,
+        core.update_db(config=self._config,
+                       start_date=parsed_args.start,
                        end_date=parsed_args.end)
 
 
