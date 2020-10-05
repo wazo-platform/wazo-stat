@@ -8,6 +8,7 @@ _DEFAULT_CONFIG = {
     'config_file': '/etc/wazo-stat/config.yml',
     'extra_config_files': '/etc/wazo-stat/conf.d',
     'debug': False,
+    'db_uri': 'postgresql://asterisk:proformatique@localhost/asterisk?application_name=wazo-stat',
 }
 
 

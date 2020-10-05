@@ -5,3 +5,6 @@
 # Extra configuration directory where the config files overriding this file
 # should be.
 extra_config_files: /etc/wazo-stat/conf.d/
+
+# Database connection informations.
+db_uri: postgresql://asterisk:proformatique@localhost/asterisk?application_name=wazo-stat
