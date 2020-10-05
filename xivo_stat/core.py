@@ -79,10 +79,11 @@ def update_db(config, end_date, start_date=None):
     logger.info('Getting objects from wazo-confd...')
     confd_queues = confd_client.queues.list(recurse=True)
     confd_agents = confd_client.agents.list(recurse=True)
+    master_tenant = token_data['metadata']['tenant_uuid']
     logger.info('Filling cache into DB')
     logger.info('Start Time: %s, End time: %s', start, end)
     with session_scope() as dao_sess:
-        insert_missing_queues(dao_sess, start, end, confd_queues['items'])
+        insert_missing_queues(dao_sess, start, end, confd_queues['items'], master_tenant)
         insert_missing_agents(dao_sess, confd_agents['items'])
         dao_sess.flush()
 
@@ -113,7 +114,7 @@ def insert_missing_agents(dao_sess, confd_agents):
     stat_agent_dao.insert_missing_agents(dao_sess, confd_agents)
 
 
-def insert_missing_queues(dao_sess, start, end, confd_queues):
+def insert_missing_queues(dao_sess, start, end, confd_queues, master_tenant):
     logger.info('Inserting missing queues...')
     queue_names = queue_log_dao.get_queue_names_in_range(dao_sess, start, end)
-    stat_queue_dao.insert_if_missing(dao_sess, queue_names, confd_queues)
+    stat_queue_dao.insert_if_missing(dao_sess, queue_names, confd_queues, master_tenant)
