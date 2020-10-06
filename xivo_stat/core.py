@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2013-2015 Avencall
+# Copyright 2013-2020 The Wazo Authors  (see the AUTHORS file)
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -18,6 +18,8 @@
 import logging
 import datetime
 
+from wazo_auth_client import Client as AuthClient
+from wazo_confd_client import Client as ConfdClient
 from xivo_dao import stat_queue_periodic_dao
 from xivo_dao import stat_agent_periodic_dao
 from xivo_dao import stat_call_on_queue_dao
@@ -57,7 +59,7 @@ def get_start_time(dao_sess):
     return start - _ERASE_TIME_WHEN_STARTING
 
 
-def update_db(end_date, start_date=None):
+def update_db(config, end_date, start_date=None):
     if start_date is None:
         try:
             with session_scope() as dao_sess:
@@ -69,11 +71,20 @@ def update_db(end_date, start_date=None):
 
     end = datetime.datetime.strptime(end_date, '%Y-%m-%dT%H:%M:%S')
 
+    auth_client = AuthClient(**config['auth'])
+    token_data = auth_client.token.new(expiration=300)
+    confd_client = ConfdClient(**config['confd'])
+    confd_client.set_token(token_data['token'])
+
+    logger.info('Getting objects from wazo-confd...')
+    confd_queues = confd_client.queues.list(recurse=True)
+    confd_agents = confd_client.agents.list(recurse=True)
+    master_tenant = token_data['metadata']['tenant_uuid']
     logger.info('Filling cache into DB')
     logger.info('Start Time: %s, End time: %s', start, end)
     with session_scope() as dao_sess:
-        insert_missing_queues(dao_sess, start, end)
-        insert_missing_agents(dao_sess)
+        insert_missing_queues(dao_sess, start, end, confd_queues['items'], master_tenant)
+        insert_missing_agents(dao_sess, confd_agents['items'])
         dao_sess.flush()
 
         queue.remove_between(dao_sess, start, end)
@@ -98,12 +109,12 @@ def clean_db():
         stat_queue_dao.clean_table(dao_sess)
 
 
-def insert_missing_agents(dao_sess):
+def insert_missing_agents(dao_sess, confd_agents):
     logger.info('Inserting missing agents...')
-    stat_agent_dao.insert_missing_agents(dao_sess)
+    stat_agent_dao.insert_missing_agents(dao_sess, confd_agents)
 
 
-def insert_missing_queues(dao_sess, start, end):
+def insert_missing_queues(dao_sess, start, end, confd_queues, master_tenant):
     logger.info('Inserting missing queues...')
     queue_names = queue_log_dao.get_queue_names_in_range(dao_sess, start, end)
-    stat_queue_dao.insert_if_missing(dao_sess, queue_names)
+    stat_queue_dao.insert_if_missing(dao_sess, queue_names, confd_queues, master_tenant)
