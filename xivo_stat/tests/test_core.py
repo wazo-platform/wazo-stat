@@ -98,9 +98,20 @@ class TestCore(unittest.TestCase):
         queue_names = ['queue_%s' % x for x in range(10)]
         mock_get_queue_names_in_range.return_value = queue_names
 
-        core.insert_missing_queues(sentinel.dao_sess, start, end, sentinel.confd_queues)
+        core.insert_missing_queues(
+            sentinel.dao_sess,
+            start,
+            end,
+            sentinel.confd_queues,
+            sentinel.master_tenant,
+        )
 
-        mock_insert_if_missing.assert_called_once_with(sentinel.dao_sess, queue_names, sentinel.confd_queues)
+        mock_insert_if_missing.assert_called_once_with(
+            sentinel.dao_sess,
+            queue_names,
+            sentinel.confd_queues,
+            sentinel.master_tenant,
+        )
 
     @patch('xivo_dao.stat_agent_dao.insert_missing_agents')
     def test_insert_missing_agents(self, mock_insert_agent_if_missing):
