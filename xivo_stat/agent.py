@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2013-2015 Avencall
+# Copyright 2013-2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import logging
@@ -19,14 +19,14 @@ def _merge_update_agent_statistics(*args):
     result = {}
 
     for stats in args:
-        for time_interval, stat in stats.iteritems():
+        for time_interval, stat in stats.items():
             if time_interval not in result:
                 result[time_interval] = {}
-            for agent, time_map in stat.iteritems():
+            for agent, time_map in stat.items():
                 if agent not in result[time_interval]:
                     result[time_interval][agent] = time_map
                 else:
-                    for time_label, time in time_map.iteritems():
+                    for time_label, time in time_map.items():
                         current_val = result[time_interval][agent].get(time_label, timedelta(seconds=0))
                         result[time_interval][agent][time_label] = time + current_val
 
@@ -51,7 +51,7 @@ def insert_periodic_stat(dao_sess, start, end):
         periodic_stats_wrapup,
     )
 
-    for period, stats in periodic_stats.iteritems():
+    for period, stats in periodic_stats.items():
         stat_agent_periodic_dao.insert_stats(dao_sess, stats, period)
     dao_sess.flush()
 
@@ -78,7 +78,7 @@ class AgentTimeComputer(object):
     def _compute_time_in_period(self, time_type, sessions_by_agent):
         results = {}
 
-        for agent, sessions in sessions_by_agent.iteritems():
+        for agent, sessions in sessions_by_agent.items():
             for time_start, time_end in sessions:
                 if not time_end:
                     time_end = self.end

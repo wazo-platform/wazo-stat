@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2013-2014 Avencall
+# Copyright 2013-2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import logging
@@ -50,7 +50,7 @@ def insert_periodic_stat(dao_sess, start, end):
     periodic_stats = stat_call_on_queue_dao.get_periodic_stats_hour(dao_sess, start, end)
     dao_sess.flush()
 
-    for period, stats in periodic_stats.iteritems():
+    for period, stats in periodic_stats.items():
         logger.info('Inserting queue periodic stat %s', period)
         stat_queue_periodic_dao.insert_stats(dao_sess, stats, period)
     dao_sess.flush()

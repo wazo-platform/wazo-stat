@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2013-2015 Avencall
+# Copyright 2013-2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import unittest
@@ -88,7 +88,7 @@ class TestAgent(unittest.TestCase):
 
         agent.insert_periodic_stat(_session(), start, end)
 
-        for period_start, agents_stats in output_stats.iteritems():
+        for period_start, agents_stats in output_stats.items():
             mock_insert_stats.assert_any_call(ANY, agents_stats, period_start)
 
 
