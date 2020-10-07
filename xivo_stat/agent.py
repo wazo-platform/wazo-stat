@@ -60,7 +60,7 @@ def remove_after_start(dao_sess, date):
     stat_agent_periodic_dao.remove_after(dao_sess, date)
 
 
-class AgentTimeComputer(object):
+class AgentTimeComputer:
 
     def __init__(self, start, end, interval_size):
         self.start = start
