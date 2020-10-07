@@ -14,21 +14,17 @@ logger = logging.getLogger(__name__)
 def fill_abandoned_call(dao_sess, start, end):
     abandoned_calls = queue_log_dao.get_queue_abandoned_call(dao_sess, start, end)
     for call in abandoned_calls:
-        stat_call_on_queue_dao.add_abandoned_call(dao_sess,
-                                                  call['callid'],
-                                                  call['time'],
-                                                  call['queue_name'],
-                                                  call['waittime'])
+        stat_call_on_queue_dao.add_abandoned_call(
+            dao_sess, call['callid'], call['time'], call['queue_name'], call['waittime']
+        )
 
 
 def fill_timeout_call(dao_sess, start, end):
     timeout_calls = queue_log_dao.get_queue_timeout_call(dao_sess, start, end)
     for call in timeout_calls:
-        stat_call_on_queue_dao.add_timeout_call(dao_sess,
-                                                call['callid'],
-                                                call['time'],
-                                                call['queue_name'],
-                                                call['waittime'])
+        stat_call_on_queue_dao.add_timeout_call(
+            dao_sess, call['callid'], call['time'], call['queue_name'], call['waittime']
+        )
 
 
 def fill_calls(dao_sess, start, end):
@@ -46,7 +42,9 @@ def fill_simple_calls(dao_sess, start, end):
 
 
 def insert_periodic_stat(dao_sess, start, end):
-    periodic_stats = stat_call_on_queue_dao.get_periodic_stats_hour(dao_sess, start, end)
+    periodic_stats = stat_call_on_queue_dao.get_periodic_stats_hour(
+        dao_sess, start, end
+    )
     dao_sess.flush()
 
     for period, stats in periodic_stats.items():

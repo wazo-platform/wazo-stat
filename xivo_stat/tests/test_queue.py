@@ -1,4 +1,4 @@
-# Copyright (C) 2013-2015 Avencall
+# Copyright 2013-2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import datetime
@@ -16,7 +16,6 @@ def _session(session):
 
 
 class TestQueue(unittest.TestCase):
-
     def setUp(self):
         self._queue_name = 'my_queue'
         self._dao_sess = _session()
@@ -24,41 +23,52 @@ class TestQueue(unittest.TestCase):
     @patch('xivo_dao.queue_log_dao.get_queue_abandoned_call')
     @patch('xivo_dao.stat_call_on_queue_dao.add_abandoned_call')
     def test_fill_abandoned(self, mock_add_abandoned_call, mock_get_abandoned_call):
-        d1 = (datetime.datetime(2012, 1, 1)
-              .strftime("%Y-%m-%d %H:%M:%S.%f"))
-        d2 = (datetime.datetime(2012, 1, 1, 23, 59, 59, 999999)
-              .strftime("%Y-%m-%d %H:%M:%S.%f"))
+        d1 = datetime.datetime(2012, 1, 1).strftime("%Y-%m-%d %H:%M:%S.%f")
+        d2 = datetime.datetime(2012, 1, 1, 23, 59, 59, 999999).strftime(
+            "%Y-%m-%d %H:%M:%S.%f"
+        )
         callid = '1234567.890'
         waittime = 3
-        mock_get_abandoned_call.return_value = [{'queue_name': self._queue_name,
-                                                 'event': 'abandoned',
-                                                 'time': d1,
-                                                 'callid': callid,
-                                                 'waittime': waittime}]
+        mock_get_abandoned_call.return_value = [
+            {
+                'queue_name': self._queue_name,
+                'event': 'abandoned',
+                'time': d1,
+                'callid': callid,
+                'waittime': waittime,
+            }
+        ]
 
         queue.fill_abandoned_call(self._dao_sess, d1, d2)
 
         mock_add_abandoned_call.assert_called_once_with(
-            self._dao_sess, callid, d1, self._queue_name, waittime)
+            self._dao_sess, callid, d1, self._queue_name, waittime
+        )
 
     @patch('xivo_dao.queue_log_dao.get_queue_timeout_call')
     @patch('xivo_dao.stat_call_on_queue_dao.add_timeout_call')
     def test_fill_timeout(self, mock_add_timeout_call, mock_get_timeout_call):
-        d1 = (datetime.datetime(2012, 1, 1)
-              .strftime("%Y-%m-%d %H:%M:%S.%f"))
-        d2 = (datetime.datetime(2012, 1, 1, 23, 59, 59, 999999)
-              .strftime("%Y-%m-%d %H:%M:%S.%f"))
+        d1 = datetime.datetime(2012, 1, 1).strftime("%Y-%m-%d %H:%M:%S.%f")
+        d2 = datetime.datetime(2012, 1, 1, 23, 59, 59, 999999).strftime(
+            "%Y-%m-%d %H:%M:%S.%f"
+        )
         callid = '1234567.890'
         waittime = 7
-        mock_get_timeout_call.return_value = [{'queue_name': self._queue_name,
-                                               'event': 'timeout',
-                                               'time': d1,
-                                               'callid': callid,
-                                               'waittime': waittime}]
+        mock_get_timeout_call.return_value = [
+            {
+                'queue_name': self._queue_name,
+                'event': 'timeout',
+                'time': d1,
+                'callid': callid,
+                'waittime': waittime,
+            }
+        ]
 
         queue.fill_timeout_call(self._dao_sess, d1, d2)
 
-        mock_add_timeout_call.assert_called_once_with(self._dao_sess, callid, d1, self._queue_name, waittime)
+        mock_add_timeout_call.assert_called_once_with(
+            self._dao_sess, callid, d1, self._queue_name, waittime
+        )
 
     @patch('xivo_stat.queue.fill_abandoned_call')
     @patch('xivo_stat.queue.fill_timeout_call')
@@ -96,8 +106,7 @@ class TestQueue(unittest.TestCase):
         stat1 = {'stats': 1234}
         stat2 = {'stats': 5555}
 
-        fake_stats = {t1: stat1,
-                      t2: stat2}
+        fake_stats = {t1: stat1, t2: stat2}
 
         mock_get_periodic_stats.return_value = fake_stats
 
@@ -110,10 +119,12 @@ class TestQueue(unittest.TestCase):
     @patch('xivo_dao.stat_call_on_queue_dao.remove_callids')
     @patch('xivo_dao.stat_call_on_queue_dao.find_all_callid_between_date')
     @patch('xivo_dao.stat_queue_periodic_dao.remove_after')
-    def test_remove_between(self,
-                            mock_stat_queue_periodic_remove_after,
-                            mock_find_all_callid_between_date,
-                            mock_remove_callids):
+    def test_remove_between(
+        self,
+        mock_stat_queue_periodic_remove_after,
+        mock_find_all_callid_between_date,
+        mock_remove_callids,
+    ):
         start = datetime.datetime(2012, 1, 1)
         end = datetime.datetime(2012, 1, 1, 23, 59, 59)
         callids = [1, 2, 3]
@@ -122,17 +133,23 @@ class TestQueue(unittest.TestCase):
 
         queue.remove_between(self._dao_sess, start, end)
 
-        mock_find_all_callid_between_date.assert_called_once_with(self._dao_sess, start, end)
+        mock_find_all_callid_between_date.assert_called_once_with(
+            self._dao_sess, start, end
+        )
         mock_remove_callids.assert_called_once_with(self._dao_sess, callids)
-        mock_stat_queue_periodic_remove_after.assert_called_once_with(self._dao_sess, start)
+        mock_stat_queue_periodic_remove_after.assert_called_once_with(
+            self._dao_sess, start
+        )
 
     @patch('xivo_dao.stat_call_on_queue_dao.remove_callids')
     @patch('xivo_dao.stat_call_on_queue_dao.find_all_callid_between_date')
     @patch('xivo_dao.stat_queue_periodic_dao.remove_after')
-    def test_remove_between_no_calls(self,
-                                     mock_stat_queue_periodic_remove_after,
-                                     mock_find_all_callid_between_date,
-                                     mock_remove_callids):
+    def test_remove_between_no_calls(
+        self,
+        mock_stat_queue_periodic_remove_after,
+        mock_find_all_callid_between_date,
+        mock_remove_callids,
+    ):
         start = datetime.datetime(2012, 1, 1)
         end = datetime.datetime(2012, 1, 1, 23, 59, 59)
         callids = []
@@ -141,6 +158,10 @@ class TestQueue(unittest.TestCase):
 
         queue.remove_between(self._dao_sess, start, end)
 
-        mock_find_all_callid_between_date.assert_called_once_with(self._dao_sess, start, end)
+        mock_find_all_callid_between_date.assert_called_once_with(
+            self._dao_sess, start, end
+        )
         self.assertEqual(mock_remove_callids.call_count, 0)
-        mock_stat_queue_periodic_remove_after.assert_called_once_with(self._dao_sess, start)
+        mock_stat_queue_periodic_remove_after.assert_called_once_with(
+            self._dao_sess, start
+        )

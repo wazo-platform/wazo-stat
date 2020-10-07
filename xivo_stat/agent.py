@@ -26,7 +26,9 @@ def _merge_update_agent_statistics(*args):
                     result[time_interval][agent] = time_map
                 else:
                     for time_label, time in time_map.items():
-                        current_val = result[time_interval][agent].get(time_label, timedelta(seconds=0))
+                        current_val = result[time_interval][agent].get(
+                            time_label, timedelta(seconds=0)
+                        )
                         result[time_interval][agent][time_label] = time + current_val
 
     return result
@@ -41,7 +43,9 @@ def insert_periodic_stat(dao_sess, start, end):
 
     periodic_stats_login = time_computer.compute_login_time_in_period(login_intervals)
     periodic_stats_pause = time_computer.compute_pause_time_in_period(pause_intervals)
-    periodic_stats_wrapup = queue_log_dao.get_wrapup_times(dao_sess, start, end, INTERVAL)
+    periodic_stats_wrapup = queue_log_dao.get_wrapup_times(
+        dao_sess, start, end, INTERVAL
+    )
     dao_sess.flush()
 
     periodic_stats = _merge_update_agent_statistics(
@@ -61,7 +65,6 @@ def remove_after_start(dao_sess, date):
 
 
 class AgentTimeComputer:
-
     def __init__(self, start, end, interval_size):
         self.start = start
         self.end = end
@@ -82,7 +85,8 @@ class AgentTimeComputer:
                 if not time_end:
                     time_end = self.end
                 touched_periods = time_utils.get_period_start_for_time_range(
-                    self.possible_intervals, time_start, time_end)
+                    self.possible_intervals, time_start, time_end
+                )
 
                 for period_start in touched_periods:
                     if period_start not in results:
@@ -92,7 +96,8 @@ class AgentTimeComputer:
                     start_in_interval = max(time_start, period_start)
                     delta = end_in_interval - start_in_interval
                     self._add_time_to_agent_in_period(
-                        results[period_start], agent, time_type, delta)
+                        results[period_start], agent, time_type, delta
+                    )
 
         return results
 

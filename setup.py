@@ -17,5 +17,5 @@ setup(
         'console_scripts': [
             'xivo-stat=xivo_stat.main:main',
         ]
-    }
+    },
 )
