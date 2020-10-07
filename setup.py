@@ -7,11 +7,15 @@ from setuptools import find_packages
 setup(
     name='xivo-stat',
     version='0.1',
-    description='XiVO Stat Generation Script',
+    description='Wazo Stat Generation Script',
     author='Wazo Authors',
-    author_email='dev.wazo@gmail.com',
-    url='http://wazo.community',
+    author_email='dev@wazo.community',
+    url='https://wazo-platform.org',
     license='GPLv3',
     packages=find_packages(),
-    scripts=['bin/xivo-stat'],
+    entry_points={
+        'console_scripts': [
+            'xivo-stat=xivo_stat.main:main',
+        ]
+    }
 )
