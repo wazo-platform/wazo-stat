@@ -1,5 +1,4 @@
-#!/usr/bin/env python
-# -*- coding: UTF-8 -*-
+#!/usr/bin/env python3
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from setuptools import setup
