@@ -24,10 +24,7 @@ DELTA_1HOUR = datetime.timedelta(hours=1)
 
 
 def hour_start(t):
-    return datetime.datetime(t.year,
-                             t.month,
-                             t.day,
-                             t.hour)
+    return datetime.datetime(t.year, t.month, t.day, t.hour)
 
 
 def end_of_previous_hour(t):
@@ -69,7 +66,9 @@ def update_db(config, end_date, start_date=None):
     logger.info('Filling cache into DB')
     logger.info('Start Time: %s, End time: %s', start, end)
     with session_scope() as dao_sess:
-        insert_missing_queues(dao_sess, start, end, confd_queues['items'], master_tenant)
+        insert_missing_queues(
+            dao_sess, start, end, confd_queues['items'], master_tenant
+        )
         insert_missing_agents(dao_sess, confd_agents['items'])
         dao_sess.flush()
 
@@ -81,7 +80,11 @@ def update_db(config, end_date, start_date=None):
         agent.insert_periodic_stat(dao_sess, start, end)
 
         for period_start in queue_log_dao.hours_with_calls(dao_sess, start, end):
-            period_end = period_start + datetime.timedelta(hours=1) - datetime.timedelta(microseconds=1)
+            period_end = (
+                period_start
+                + datetime.timedelta(hours=1)
+                - datetime.timedelta(microseconds=1)
+            )
             queue.fill_calls(dao_sess, period_start, period_end)
             queue.insert_periodic_stat(dao_sess, period_start, period_end)
 
