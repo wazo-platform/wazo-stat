@@ -12,7 +12,7 @@ from xivo.xivo_logging import setup_logging
 from xivo_dao import init_db_from_config
 from wazo_stat import core, config
 
-PIDFILENAME = '/run/xivo-stat.pid'
+PIDFILENAME = '/run/wazo-stat.pid'
 
 
 def main():
