@@ -4,8 +4,8 @@
 import unittest
 import datetime
 from mock import ANY, patch, sentinel
-from xivo_stat import core
-from xivo_stat.core import _ERASE_TIME_WHEN_STARTING
+from wazo_stat import core
+from wazo_stat.core import _ERASE_TIME_WHEN_STARTING
 
 
 class TestCore(unittest.TestCase):

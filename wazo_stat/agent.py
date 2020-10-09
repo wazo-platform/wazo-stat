@@ -7,7 +7,7 @@ from datetime import timedelta
 from xivo_dao import stat_dao, stat_agent_periodic_dao
 from xivo_dao import queue_log_dao
 
-from xivo_stat import time_utils
+from wazo_stat import time_utils
 
 logger = logging.getLogger(__name__)
 

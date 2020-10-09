@@ -7,7 +7,7 @@ from xivo.config_helper import read_config_file_hierarchy, parse_config_file
 _DEFAULT_CONFIG = {
     'config_file': '/etc/wazo-stat/config.yml',
     'extra_config_files': '/etc/wazo-stat/conf.d',
-    'log_filename': '/var/log/xivo-stat.log',
+    'log_filename': '/var/log/wazo-stat.log',
     'debug': False,
     'db_uri': 'postgresql://asterisk:proformatique@localhost/asterisk?application_name=wazo-stat',
     'confd': {'host': 'localhost', 'port': 9486, 'prefix': None, 'https': False},

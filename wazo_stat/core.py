@@ -14,8 +14,7 @@ from xivo_dao import stat_queue_dao
 from xivo_dao import stat_agent_dao
 from xivo_dao.helpers.db_utils import session_scope
 
-from xivo_stat import queue
-from xivo_stat import agent
+from wazo_stat import agent, queue
 
 logger = logging.getLogger(__name__)
 

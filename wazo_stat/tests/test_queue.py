@@ -7,7 +7,7 @@ import unittest
 from mock import patch
 from xivo_dao.helpers.db_manager import daosession
 
-from xivo_stat import queue
+from wazo_stat import queue
 
 
 @daosession
@@ -70,8 +70,8 @@ class TestQueue(unittest.TestCase):
             self._dao_sess, callid, d1, self._queue_name, waittime
         )
 
-    @patch('xivo_stat.queue.fill_abandoned_call')
-    @patch('xivo_stat.queue.fill_timeout_call')
+    @patch('wazo_stat.queue.fill_abandoned_call')
+    @patch('wazo_stat.queue.fill_timeout_call')
     def test_fill_calls(self, mock_fill_timeout_call, mock_fill_abandoned_call):
         start = datetime.datetime(2012, 1, 1)
         end = datetime.datetime(2012, 1, 1, 4, 59, 59, 999999)

@@ -6,7 +6,7 @@
 # should be.
 extra_config_files: /etc/wazo-stat/conf.d/
 
-log_filename: /var/log/xivo-stat.log
+log_filename: /var/log/wazo-stat.log
 debug: false
 
 # Database connection informations.

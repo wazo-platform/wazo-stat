@@ -1,6 +1,6 @@
 Format: http://dep.debian.net/deps/dep5
-Upstream-Name: xivo-stat
-Source: https://github.com/wazo-platform/xivo-stat.git
+Upstream-Name: wazo-stat
+Source: https://github.com/wazo-platform/wazo-stat.git
 
 Files: *
 Copyright: 2012-2020 The Wazo Authors
