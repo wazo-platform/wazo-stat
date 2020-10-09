@@ -1,5 +1,5 @@
 #
-# cron jobs for xivo-stat
+# cron jobs for wazo-stat
 #
 
-0 */6 * * * root /usr/bin/xivo-stat fill_db > /dev/null
+0 */6 * * * root /usr/bin/wazo-stat fill_db > /dev/null
