@@ -5,7 +5,7 @@ from setuptools import setup
 from setuptools import find_packages
 
 setup(
-    name='xivo-stat',
+    name='wazo-stat',
     version='0.1',
     description='Wazo Stat Generation Script',
     author='Wazo Authors',
@@ -15,7 +15,7 @@ setup(
     packages=find_packages(),
     entry_points={
         'console_scripts': [
-            'xivo-stat=xivo_stat.main:main',
+            'wazo-stat=wazo_stat.main:main',
         ]
     },
 )
