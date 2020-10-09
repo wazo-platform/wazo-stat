@@ -10,7 +10,7 @@ from xivo import argparse_cmd
 from xivo.daemonize import pidfile_context
 from xivo.xivo_logging import setup_logging
 from xivo_dao import init_db_from_config
-from xivo_stat import core, config
+from wazo_stat import core, config
 
 PIDFILENAME = '/run/xivo-stat.pid'
 

@@ -6,7 +6,7 @@ import unittest
 from datetime import datetime
 from datetime import timedelta
 
-from xivo_stat import time_utils
+from wazo_stat import time_utils
 
 
 class TestTimeUtils(unittest.TestCase):
