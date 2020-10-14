@@ -60,7 +60,7 @@ def parse_args(parser):
         default=datetime.now().strftime('%Y-%m-%dT%H:%M:%S'),
         help='End date to generate the statistics using this format: {}'.format(
             HELP_DATETIME_FORMAT
-        )
+        ),
     )
 
     return parser.parse_args()
