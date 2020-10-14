@@ -6,13 +6,13 @@ import re
 
 from datetime import datetime
 
-from xivo import argparse_cmd
 from xivo.daemonize import pidfile_context
 from xivo.xivo_logging import setup_logging
 from xivo_dao import init_db_from_config
 from wazo_stat import core, config
 
 PIDFILENAME = '/run/wazo-stat.pid'
+HELP_DATETIME_FORMAT = '%%Y-%%m-%%dT%%H:%%M:%%S'
 
 
 def main():
@@ -23,52 +23,47 @@ def main():
         main_config['log_filename'], debug=main_config['debug'], log_format=log_format
     )
 
-    command = _XivoStatCommand(main_config)
     with pidfile_context(PIDFILENAME):
-        argparse_cmd.execute_command(command)
+        parser = argparse.ArgumentParser(description='Wazo statistics generator')
+        options = parse_args(parser)
+        subcommand = getattr(options, 'subcommand', None)
+
+        if subcommand == 'fill_db':
+            core.update_db(
+                config=main_config,
+                start_date=options.start,
+                end_date=options.end,
+            )
+        elif subcommand == 'clean_db':
+            core.clean_db()
+        else:
+            parser.print_help()
 
 
-class _XivoStatCommand(argparse_cmd.AbstractCommand):
-    def __init__(self, main_config):
-        self._config = main_config
+def parse_args(parser):
+    subparsers = parser.add_subparsers()
+    fill_db_parser = subparsers.add_parser('fill_db')
+    fill_db_parser.set_defaults(subcommand='fill_db')
+    clean_db_parser = subparsers.add_parser('clean_db')
+    clean_db_parser.set_defaults(subcommand='clean_db')
 
-    def configure_subcommands(self, subcommands):
-        subcommands.add_subcommand(_FillDbSubcommand('fill_db', self._config))
-        subcommands.add_subcommand(_CleanDbSubcommand('clean_db'))
+    fill_db_parser.add_argument(
+        '--start',
+        type=_datetime_iso,
+        help='Start date to generate the statistics using this format: {}'.format(
+            HELP_DATETIME_FORMAT
+        ),
+    )
+    fill_db_parser.add_argument(
+        '--end',
+        type=_datetime_iso,
+        default=datetime.now().strftime('%Y-%m-%dT%H:%M:%S'),
+        help='End date to generate the statistics using this format: {}'.format(
+            HELP_DATETIME_FORMAT
+        ),
+    )
 
-
-class _FillDbSubcommand(argparse_cmd.AbstractSubcommand):
-    _HELP_DATETIME_FORMAT = '%%Y-%%m-%%dT%%H:%%M:%%S'
-    _DATETIME_FORMAT = '%Y-%m-%dT%H:%M:%S'
-
-    def __init__(self, name, main_config):
-        super(_FillDbSubcommand, self).__init__(name)
-        self._config = main_config
-
-    def configure_parser(self, parser):
-        parser.add_argument(
-            '--start',
-            type=_datetime_iso,
-            help='Start date to generate the statistics using this format: %s'
-            % self._HELP_DATETIME_FORMAT,
-        )
-        parser.add_argument(
-            '--end',
-            type=_datetime_iso,
-            default=datetime.now().strftime(self._DATETIME_FORMAT),
-            help='End date to generate the statistics using this format: %s'
-            % self._HELP_DATETIME_FORMAT,
-        )
-
-    def execute(self, parsed_args):
-        core.update_db(
-            config=self._config, start_date=parsed_args.start, end_date=parsed_args.end
-        )
-
-
-class _CleanDbSubcommand(argparse_cmd.AbstractSubcommand):
-    def execute(self, _):
-        core.clean_db()
+    return parser.parse_args()
 
 
 def _datetime_iso(value):
