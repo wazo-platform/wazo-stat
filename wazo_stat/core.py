@@ -23,7 +23,7 @@ DELTA_1HOUR = datetime.timedelta(hours=1)
 
 
 def hour_start(t):
-    return datetime.datetime(t.year, t.month, t.day, t.hour)
+    return datetime.datetime(t.year, t.month, t.day, t.hour, tzinfo=t.tzinfo)
 
 
 def end_of_previous_hour(t):
@@ -49,9 +49,9 @@ def update_db(config, end_date, start_date=None):
         except RuntimeError:
             return
     else:
-        start = datetime.datetime.strptime(start_date, '%Y-%m-%dT%H:%M:%S')
+        start = datetime.datetime.strptime(start_date, '%Y-%m-%dT%H:%M:%S%z')
 
-    end = datetime.datetime.strptime(end_date, '%Y-%m-%dT%H:%M:%S')
+    end = datetime.datetime.strptime(end_date, '%Y-%m-%dT%H:%M:%S%z')
 
     auth_client = AuthClient(**config['auth'])
     token_data = auth_client.token.new(expiration=300)

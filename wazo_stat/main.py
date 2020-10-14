@@ -5,6 +5,7 @@ import argparse
 import re
 
 from datetime import datetime
+from datetime import timezone as tz
 
 from xivo.daemonize import pidfile_context
 from xivo.xivo_logging import setup_logging
@@ -12,7 +13,7 @@ from xivo_dao import init_db_from_config
 from wazo_stat import core, config
 
 PIDFILENAME = '/run/wazo-stat.pid'
-HELP_DATETIME_FORMAT = '%%Y-%%m-%%dT%%H:%%M:%%S'
+HELP_DATETIME_FORMAT = '%%Y-%%m-%%dT%%H:%%M:%%S+0000'
 
 
 def main():
@@ -57,7 +58,7 @@ def parse_args(parser):
     fill_db_parser.add_argument(
         '--end',
         type=_datetime_iso,
-        default=datetime.now().strftime('%Y-%m-%dT%H:%M:%S'),
+        default=datetime.now(tz=tz.utc).strftime('%Y-%m-%dT%H:%M:%S%z'),
         help='End date to generate the statistics using this format: {}'.format(
             HELP_DATETIME_FORMAT
         ),
@@ -67,7 +68,7 @@ def parse_args(parser):
 
 
 def _datetime_iso(value):
-    datetime_pattern = r'(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2})'
+    datetime_pattern = r'(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}[-+]\d{4})'
     datetime_pattern_re = re.compile(datetime_pattern)
     if not datetime_pattern_re.match(value):
         raise argparse.ArgumentTypeError('%s is not a valid datetime format' % value)
