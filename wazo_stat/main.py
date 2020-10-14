@@ -13,7 +13,7 @@ from xivo_dao import init_db_from_config
 from wazo_stat import core, config
 
 PIDFILENAME = '/run/wazo-stat.pid'
-HELP_DATETIME_FORMAT = '%%Y-%%m-%%dT%%H:%%M:%%S%%z'
+HELP_DATETIME_FORMAT = '%%Y-%%m-%%dT%%H:%%M:%%S+0000'
 
 
 def main():
