@@ -1,9 +1,11 @@
-# Copyright 2013-2020 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2013-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import unittest
 import datetime
-from mock import ANY, patch, sentinel
+
+from unittest.mock import ANY, patch, sentinel
+
 from wazo_stat import core
 from wazo_stat.core import _ERASE_TIME_WHEN_STARTING
 
