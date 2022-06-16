@@ -1,4 +1,4 @@
-# Copyright 2013-2020 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2013-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import logging
@@ -35,7 +35,6 @@ def _merge_update_agent_statistics(*args):
 
 
 def insert_periodic_stat(dao_sess, start, end):
-    logger.info('Inserting agent periodic stat')
     time_computer = AgentTimeComputer(start, end, INTERVAL)
 
     login_intervals = stat_dao.get_login_intervals_in_range(dao_sess, start, end)
