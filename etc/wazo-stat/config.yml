@@ -14,7 +14,7 @@ log_filename: /var/log/wazo-stat.log
 # Database connection settings.
 db_uri: postgresql://asterisk:proformatique@localhost/asterisk?application_name=wazo-stat
 
-# wazo-auth (authentication daemon) connection settings.
+# wazo-auth connection settings.
 auth:
   host: localhost
   port: 9497
