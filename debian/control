@@ -3,12 +3,12 @@ Section: python
 Priority: extra
 Maintainer: Wazo Maintainers <dev@gwazo.community>
 Build-Depends:
- debhelper (>= 9),
+ debhelper (>= 12),
  dh-python,
  python3-all,
  python3-setuptools
 Standards-Version: 3.9.6
-X-Python-Version: >= 3.7
+X-Python-Version: >= 3.9
 
 Package: wazo-stat
 Architecture: all

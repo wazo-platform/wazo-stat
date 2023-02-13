@@ -7,7 +7,7 @@ Wazo statistic generation utilities
 ## Running unit tests
 
 ```shell
-apt-get install libpq-dev python-dev libyaml-dev
+apt-get install libpq-dev python3-dev libyaml-dev
 pip install tox
-tox --recreate -e py37
+tox --recreate -e py39
 ```
