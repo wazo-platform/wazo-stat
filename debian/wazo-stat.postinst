@@ -6,11 +6,6 @@ set -e
 
 case "$1" in
     configure)
-        # move files from xivo-stat
-        if [ -f /var/log/xivo-stat.log ] ; then
-            rename 's/xivo-stat/wazo-stat/g' /var/log/xivo-stat.log*
-        fi
-        # End of move files from xivo-stat
     ;;
     abort-upgrade|abort-remove|abort-deconfigure)
 
