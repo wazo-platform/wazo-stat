@@ -1,10 +1,10 @@
-# Copyright 2013-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2013-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import datetime
 import unittest
-
 from unittest.mock import patch
+
 from xivo_dao.helpers.db_manager import daosession
 
 from wazo_stat import queue

@@ -1,11 +1,10 @@
-# Copyright 2013-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2013-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import logging
 from datetime import timedelta
 
-from xivo_dao import stat_dao, stat_agent_periodic_dao
-from xivo_dao import queue_log_dao
+from xivo_dao import queue_log_dao, stat_agent_periodic_dao, stat_dao
 
 from wazo_stat import time_utils
 

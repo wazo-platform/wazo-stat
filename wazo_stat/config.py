@@ -1,8 +1,8 @@
-# Copyright 2020 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2020-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo.chain_map import ChainMap
-from xivo.config_helper import read_config_file_hierarchy, parse_config_file
+from xivo.config_helper import parse_config_file, read_config_file_hierarchy
 
 _DEFAULT_CONFIG = {
     'config_file': '/etc/wazo-stat/config.yml',
