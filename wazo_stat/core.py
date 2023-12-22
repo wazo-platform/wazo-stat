@@ -1,17 +1,19 @@
-# Copyright 2013-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2013-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-import logging
 import datetime
+import logging
 
 from wazo_auth_client import Client as AuthClient
 from wazo_confd_client import Client as ConfdClient
-from xivo_dao import stat_queue_periodic_dao
-from xivo_dao import stat_agent_periodic_dao
-from xivo_dao import stat_call_on_queue_dao
-from xivo_dao import queue_log_dao
-from xivo_dao import stat_queue_dao
-from xivo_dao import stat_agent_dao
+from xivo_dao import (
+    queue_log_dao,
+    stat_agent_dao,
+    stat_agent_periodic_dao,
+    stat_call_on_queue_dao,
+    stat_queue_dao,
+    stat_queue_periodic_dao,
+)
 from xivo_dao.helpers.db_utils import session_scope
 
 from wazo_stat import agent, queue

@@ -1,16 +1,16 @@
-# Copyright 2012-2020 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2012-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import argparse
 import re
-
 from datetime import datetime
 from datetime import timezone as tz
 
 from xivo.daemonize import pidfile_context
 from xivo.xivo_logging import setup_logging
 from xivo_dao import init_db_from_config
-from wazo_stat import core, config
+
+from wazo_stat import config, core
 
 PIDFILENAME = '/run/wazo-stat.pid'
 HELP_DATETIME_FORMAT = '%%Y-%%m-%%dT%%H:%%M:%%S+0000'
