@@ -1,6 +1,6 @@
 Source: wazo-stat
 Section: python
-Priority: extra
+Priority: optional
 Maintainer: Wazo Maintainers <dev@gwazo.community>
 Build-Depends:
  debhelper (>= 12),
@@ -12,17 +12,13 @@ X-Python3-Version: >= 3.9
 
 Package: wazo-stat
 Architecture: all
-Provides: xivo-stat
-Conflicts: xivo-stat
-Replaces: xivo-stat
 Depends:
  ${python3:Depends},
  ${misc:Depends},
  python3-requests,
  wazo-auth-client-python3,
  wazo-confd-client-python3,
- xivo-libdao-python3,
- rename
+ xivo-libdao-python3
 Description: Wazo statistics generator
  Wazo is a system based on a powerful IPBX, to bring an easy to
  install solution for telephony and related services.
