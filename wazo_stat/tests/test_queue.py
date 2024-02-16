@@ -1,4 +1,4 @@
-# Copyright 2013-2023 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2013-2024 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import datetime
@@ -28,6 +28,7 @@ class TestQueue(unittest.TestCase):
             "%Y-%m-%d %H:%M:%S.%f"
         )
         callid = '1234567.890'
+        callid2 = '1234567.891'
         waittime = 3
         mock_get_abandoned_call.return_value = [
             {
@@ -36,7 +37,15 @@ class TestQueue(unittest.TestCase):
                 'time': d1,
                 'callid': callid,
                 'waittime': waittime,
-            }
+            },
+            # should be ignored
+            {
+                'queue_name': self._queue_name,
+                'event': 'abandoned',
+                'time': d1,
+                'callid': callid2,
+                'waittime': '',
+            },
         ]
 
         queue.fill_abandoned_call(self._dao_sess, d1, d2)
@@ -53,6 +62,7 @@ class TestQueue(unittest.TestCase):
             "%Y-%m-%d %H:%M:%S.%f"
         )
         callid = '1234567.890'
+        callid2 = '1234567.891'
         waittime = 7
         mock_get_timeout_call.return_value = [
             {
@@ -61,7 +71,15 @@ class TestQueue(unittest.TestCase):
                 'time': d1,
                 'callid': callid,
                 'waittime': waittime,
-            }
+            },
+            # should be ignored
+            {
+                'queue_name': self._queue_name,
+                'event': 'timeout',
+                'time': d1,
+                'callid': callid2,
+                'waittime': '',
+            },
         ]
 
         queue.fill_timeout_call(self._dao_sess, d1, d2)

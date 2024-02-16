@@ -1,4 +1,4 @@
-# Copyright 2013-2023 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2013-2024 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import logging
@@ -16,6 +16,12 @@ logger = logging.getLogger(__name__)
 def fill_abandoned_call(dao_sess, start, end):
     abandoned_calls = queue_log_dao.get_queue_abandoned_call(dao_sess, start, end)
     for call in abandoned_calls:
+        if not call['waittime']:
+            logger.error(
+                "Abandoned call (callid=%s) missing waittime value, skipping",
+                call['callid'],
+            )
+            continue
         stat_call_on_queue_dao.add_abandoned_call(
             dao_sess, call['callid'], call['time'], call['queue_name'], call['waittime']
         )
@@ -24,6 +30,12 @@ def fill_abandoned_call(dao_sess, start, end):
 def fill_timeout_call(dao_sess, start, end):
     timeout_calls = queue_log_dao.get_queue_timeout_call(dao_sess, start, end)
     for call in timeout_calls:
+        if not call['waittime']:
+            logger.error(
+                "Abandoned call (callid=%s) missing waittime value, skipping",
+                call['callid'],
+            )
+            continue
         stat_call_on_queue_dao.add_timeout_call(
             dao_sess, call['callid'], call['time'], call['queue_name'], call['waittime']
         )
