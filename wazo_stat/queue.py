@@ -32,7 +32,7 @@ def fill_timeout_call(dao_sess, start, end):
     for call in timeout_calls:
         if not call['waittime']:
             logger.error(
-                "Abandoned call (callid=%s) missing waittime value, skipping",
+                "Timeout call (callid=%s) missing waittime value, skipping",
                 call['callid'],
             )
             continue
