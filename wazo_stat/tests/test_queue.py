@@ -3,7 +3,7 @@
 
 import datetime
 import unittest
-from unittest.mock import patch
+from unittest.mock import call, patch
 
 from xivo_dao.helpers.db_manager import daosession
 
@@ -29,6 +29,7 @@ class TestQueue(unittest.TestCase):
         )
         callid = '1234567.890'
         callid2 = '1234567.891'
+        callid3 = '1234567.892'
         waittime = 3
         mock_get_abandoned_call.return_value = [
             {
@@ -44,14 +45,25 @@ class TestQueue(unittest.TestCase):
                 'event': 'abandoned',
                 'time': d1,
                 'callid': callid2,
-                'waittime': '',
+                'waittime': None,
+            },
+            # should pass
+            {
+                'queue_name': self._queue_name,
+                'event': 'abandoned',
+                'time': d1,
+                'callid': callid3,
+                'waittime': 0,
             },
         ]
 
         queue.fill_abandoned_call(self._dao_sess, d1, d2)
 
-        mock_add_abandoned_call.assert_called_once_with(
-            self._dao_sess, callid, d1, self._queue_name, waittime
+        mock_add_abandoned_call.assert_has_calls(
+            [
+                call(self._dao_sess, callid, d1, self._queue_name, waittime),
+                call(self._dao_sess, callid3, d1, self._queue_name, 0),
+            ]
         )
 
     @patch('xivo_dao.queue_log_dao.get_queue_timeout_call')
@@ -63,6 +75,7 @@ class TestQueue(unittest.TestCase):
         )
         callid = '1234567.890'
         callid2 = '1234567.891'
+        callid3 = '1234567.892'
         waittime = 7
         mock_get_timeout_call.return_value = [
             {
@@ -78,14 +91,25 @@ class TestQueue(unittest.TestCase):
                 'event': 'timeout',
                 'time': d1,
                 'callid': callid2,
-                'waittime': '',
+                'waittime': None,
+            },
+            # should pass
+            {
+                'queue_name': self._queue_name,
+                'event': 'timeout',
+                'time': d1,
+                'callid': callid3,
+                'waittime': 0,
             },
         ]
 
         queue.fill_timeout_call(self._dao_sess, d1, d2)
 
-        mock_add_timeout_call.assert_called_once_with(
-            self._dao_sess, callid, d1, self._queue_name, waittime
+        mock_add_timeout_call.assert_has_calls(
+            [
+                call(self._dao_sess, callid, d1, self._queue_name, waittime),
+                call(self._dao_sess, callid3, d1, self._queue_name, 0),
+            ]
         )
 
     @patch('wazo_stat.queue.fill_abandoned_call')
