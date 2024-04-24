@@ -16,7 +16,7 @@ logger = logging.getLogger(__name__)
 def fill_abandoned_call(dao_sess, start, end):
     abandoned_calls = queue_log_dao.get_queue_abandoned_call(dao_sess, start, end)
     for call in abandoned_calls:
-        if not call['waittime']:
+        if call['waittime'] is None:
             logger.error(
                 "Abandoned call (callid=%s) missing waittime value, skipping",
                 call['callid'],
@@ -30,7 +30,7 @@ def fill_abandoned_call(dao_sess, start, end):
 def fill_timeout_call(dao_sess, start, end):
     timeout_calls = queue_log_dao.get_queue_timeout_call(dao_sess, start, end)
     for call in timeout_calls:
-        if not call['waittime']:
+        if call['waittime'] is None:
             logger.error(
                 "Timeout call (callid=%s) missing waittime value, skipping",
                 call['callid'],
