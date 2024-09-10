@@ -8,4 +8,4 @@ sqlalchemy-utils==0.36.8  # from xivo-dao
 psycopg2-binary==2.8.6  # from xivo-dao
 pyyaml==5.3.1 # from xivo-lib-python
 requests==2.25.1  # from wazo-*-client
-stevedore==3.2.2  # from wazo-*-client
+stevedore==4.0.2  # from wazo-*-client
