@@ -1,4 +1,4 @@
-# Copyright 2013-2023 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2013-2025 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import datetime
@@ -21,7 +21,6 @@ from wazo_stat import agent, queue
 logger = logging.getLogger(__name__)
 
 _ERASE_TIME_WHEN_STARTING = datetime.timedelta(hours=8)
-DELTA_1HOUR = datetime.timedelta(hours=1)
 
 
 def hour_start(t):
