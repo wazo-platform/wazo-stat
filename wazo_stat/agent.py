@@ -68,6 +68,12 @@ def _resolve_queue_names(dao_sess, stats, cache):
             continue
         if queue_name not in cache:
             cache[queue_name] = _get_queue_id_by_name(dao_sess, queue_name)
+            if cache[queue_name] is None:
+                logger.debug(
+                    'Queue "%s" not found in stat_queue: '
+                    'skipping per-queue agent stats',
+                    queue_name,
+                )
         stat_queue_id = cache[queue_name]
         if stat_queue_id is None:
             continue
