@@ -1,4 +1,4 @@
-# Copyright 2013-2023 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2013-2026 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import unittest
@@ -33,44 +33,46 @@ class TestAgent(unittest.TestCase):
         agent_id_1 = 12
         agent_id_2 = 13
         login = {
-            agent_id_1: [
+            (agent_id_1, None): [
                 (dt(2012, 1, 1, 1, 5), dt(2012, 1, 1, 1, 15)),
                 (dt(2012, 1, 1, 1, 20), dt(2012, 1, 1, 2, 20)),
             ],
-            agent_id_2: [
+            (agent_id_2, None): [
                 (dt(2012, 1, 1, 1), dt(2012, 1, 1, 5)),
             ],
         }
         pause = {
-            agent_id_1: [
+            (agent_id_1, None): [
                 (dt(2012, 1, 1, 1, 35), dt(2012, 1, 1, 1, 40)),
             ],
-            agent_id_2: [
+            (agent_id_2, None): [
                 (dt(2012, 1, 1, 2), dt(2012, 1, 1, 3)),
             ],
         }
         output_stats = {
             dt(2012, 1, 1, 1): {
-                agent_id_1: {
+                (agent_id_1, None): {
                     'login_time': timedelta(minutes=50),
                     'pause_time': timedelta(minutes=5),
                 },
-                agent_id_2: {'login_time': ONE_HOUR},
+                (agent_id_2, None): {'login_time': ONE_HOUR},
             },
             dt(2012, 1, 1, 2): {
-                agent_id_1: {'login_time': timedelta(minutes=20)},
-                agent_id_2: {'login_time': ONE_HOUR, 'pause_time': ONE_HOUR},
+                (agent_id_1, None): {'login_time': timedelta(minutes=20)},
+                (agent_id_2, None): {'login_time': ONE_HOUR, 'pause_time': ONE_HOUR},
             },
             dt(2012, 1, 1, 3): {
-                agent_id_1: {'wrapup_time': timedelta(seconds=15)},
-                agent_id_2: {'login_time': ONE_HOUR},
+                (agent_id_1, None): {'wrapup_time': timedelta(seconds=15)},
+                (agent_id_2, None): {'login_time': ONE_HOUR},
             },
             dt(2012, 1, 1, 4): {
-                agent_id_2: {'login_time': ONE_HOUR},
+                (agent_id_2, None): {'login_time': ONE_HOUR},
             },
         }
         wrapups = {
-            dt(2012, 1, 1, 3): {agent_id_1: {'wrapup_time': timedelta(seconds=15)}},
+            dt(2012, 1, 1, 3): {
+                (agent_id_1, None): {'wrapup_time': timedelta(seconds=15)},
+            },
         }
         start = dt(2012, 1, 1, 1)
         end = dt(2012, 1, 1, 4)
@@ -86,6 +88,117 @@ class TestAgent(unittest.TestCase):
 
         for period_start, agents_stats in output_stats.items():
             mock_insert_stats.assert_any_call(ANY, agents_stats, period_start)
+
+    @patch('wazo_stat.agent._get_queue_id_by_name')
+    @patch('xivo_dao.stat_agent_periodic_dao.insert_stats')
+    @patch('xivo_dao.stat_dao.get_login_intervals_in_range')
+    @patch('xivo_dao.stat_dao.get_pause_intervals_in_range')
+    @patch('xivo_dao.queue_log_dao.get_wrapup_times')
+    def test_insert_periodic_stat_resolves_queue_names(
+        self,
+        mock_get_wrapup_times,
+        mock_get_pause_intervals_in_range,
+        mock_get_login_intervals_in_range,
+        mock_insert_stats,
+        mock_get_queue_id_by_name,
+    ):
+        agent_id = 42
+        queue_name = 'sales'
+        stat_queue_id = 7
+        period = dt(2012, 1, 1, 1)
+
+        mock_get_queue_id_by_name.side_effect = lambda sess, name: (
+            stat_queue_id if name == queue_name else None
+        )
+
+        login_output = {
+            period: {
+                (agent_id, None): {'login_time': ONE_HOUR},
+                (agent_id, queue_name): {'login_time': timedelta(minutes=30)},
+                (agent_id, 'deleted_queue'): {'login_time': timedelta(minutes=5)},
+            },
+        }
+        pause_output = {
+            period: {
+                (agent_id, None): {'pause_time': timedelta(minutes=2)},
+            },
+        }
+        wrapups = {
+            period: {
+                (agent_id, None): {'wrapup_time': timedelta(seconds=10)},
+                (agent_id, queue_name): {'wrapup_time': timedelta(seconds=10)},
+            },
+        }
+
+        mock_get_login_intervals_in_range.return_value = {}
+        mock_get_pause_intervals_in_range.return_value = {}
+        mock_get_wrapup_times.return_value = wrapups
+
+        with patch.object(agent, 'AgentTimeComputer') as mock_computer_cls:
+            computer = mock_computer_cls.return_value
+            computer.compute_login_time_in_period.return_value = login_output
+            computer.compute_pause_time_in_period.return_value = pause_output
+
+            agent.insert_periodic_stat(_session(), period, period + ONE_HOUR)
+
+        expected_resolved = {
+            (agent_id, None): {
+                'login_time': ONE_HOUR,
+                'pause_time': timedelta(minutes=2),
+                'wrapup_time': timedelta(seconds=10),
+            },
+            (agent_id, stat_queue_id): {
+                'login_time': timedelta(minutes=30),
+                'wrapup_time': timedelta(seconds=10),
+            },
+        }
+        mock_insert_stats.assert_any_call(ANY, expected_resolved, period)
+
+    @patch('wazo_stat.agent._get_queue_id_by_name')
+    @patch('xivo_dao.stat_agent_periodic_dao.insert_stats')
+    @patch('xivo_dao.stat_dao.get_login_intervals_in_range')
+    @patch('xivo_dao.stat_dao.get_pause_intervals_in_range')
+    @patch('xivo_dao.queue_log_dao.get_wrapup_times')
+    def test_insert_periodic_stat_fans_out_per_queue_pause(
+        self,
+        mock_get_wrapup_times,
+        mock_get_pause_intervals_in_range,
+        mock_get_login_intervals_in_range,
+        mock_insert_stats,
+        mock_get_queue_id_by_name,
+    ):
+        agent_id = 42
+        queue_name = 'sales'
+        stat_queue_id = 7
+        period = dt(2012, 1, 1, 1)
+
+        mock_get_queue_id_by_name.side_effect = lambda sess, name: (
+            stat_queue_id if name == queue_name else None
+        )
+
+        pause_output = {
+            period: {
+                (agent_id, None): {'pause_time': timedelta(minutes=5)},
+                (agent_id, queue_name): {'pause_time': timedelta(minutes=3)},
+            },
+        }
+
+        mock_get_login_intervals_in_range.return_value = {}
+        mock_get_pause_intervals_in_range.return_value = {}
+        mock_get_wrapup_times.return_value = {}
+
+        with patch.object(agent, 'AgentTimeComputer') as mock_computer_cls:
+            computer = mock_computer_cls.return_value
+            computer.compute_login_time_in_period.return_value = {}
+            computer.compute_pause_time_in_period.return_value = pause_output
+
+            agent.insert_periodic_stat(_session(), period, period + ONE_HOUR)
+
+        expected_resolved = {
+            (agent_id, None): {'pause_time': timedelta(minutes=5)},
+            (agent_id, stat_queue_id): {'pause_time': timedelta(minutes=3)},
+        }
+        mock_insert_stats.assert_any_call(ANY, expected_resolved, period)
 
 
 class TestAgentLoginTimeComputer(unittest.TestCase):

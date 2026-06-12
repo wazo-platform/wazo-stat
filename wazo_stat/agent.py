@@ -1,10 +1,11 @@
-# Copyright 2013-2023 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2013-2026 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import logging
 from datetime import timedelta
 
 from xivo_dao import queue_log_dao, stat_agent_periodic_dao, stat_dao
+from xivo_dao.alchemy.stat_queue import StatQueue
 
 from wazo_stat import time_utils
 
@@ -52,9 +53,37 @@ def insert_periodic_stat(dao_sess, start, end):
         periodic_stats_wrapup,
     )
 
+    queue_id_cache: dict[str, int | None] = {}
     for period, stats in periodic_stats.items():
-        stat_agent_periodic_dao.insert_stats(dao_sess, stats, period)
+        resolved = _resolve_queue_names(dao_sess, stats, queue_id_cache)
+        stat_agent_periodic_dao.insert_stats(dao_sess, resolved, period)
     dao_sess.flush()
+
+
+def _resolve_queue_names(dao_sess, stats, cache):
+    resolved = {}
+    for (agent_id, queue_name), times in stats.items():
+        if queue_name is None:
+            resolved[(agent_id, None)] = times
+            continue
+        if queue_name not in cache:
+            cache[queue_name] = _get_queue_id_by_name(dao_sess, queue_name)
+            if cache[queue_name] is None:
+                logger.debug(
+                    'Queue "%s" not found in stat_queue: '
+                    'skipping per-queue agent stats',
+                    queue_name,
+                )
+        stat_queue_id = cache[queue_name]
+        if stat_queue_id is None:
+            continue
+        resolved[(agent_id, stat_queue_id)] = times
+    return resolved
+
+
+def _get_queue_id_by_name(dao_sess, queue_name: str) -> int | None:
+    row = dao_sess.query(StatQueue.id).filter_by(name=queue_name, deleted=False).first()
+    return row.id if row else None
 
 
 def remove_after_start(dao_sess, date):
