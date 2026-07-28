@@ -1,4 +1,4 @@
-# Copyright 2020-2023 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2020-2026 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo.chain_map import ChainMap
@@ -13,8 +13,7 @@ _DEFAULT_CONFIG = {
     'confd': {'host': 'localhost', 'port': 9486, 'prefix': None, 'https': False},
     'auth': {
         'host': 'localhost',
-        'port': 9497,
-        'prefix': None,
+        'port': 80,
         'https': False,
         'key_file': '/var/lib/wazo-auth-keys/wazo-stat-key.yml',
     },
